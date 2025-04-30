@@ -1,16 +1,26 @@
 const express = require("express");
-const { signup, login, getPetHouseProfile } = require("../controllers/pethouseController");
+const {
+  signup,
+  login,
+  getPetHouseProfile,
+  updateProfile,
+  getAllPetHouses,
+  acceptBooking,
+  cancelBooking
+} = require("../controllers/pethouseController");
 const verifyToken = require("../middlewares/auth");
 
 const router = express.Router();
 
-// PetHouse Signup Route
+// Public Routes
 router.post("/signup", signup);
-
-// PetHouse Login Route
 router.post("/login", login);
 
-// Protected Route: Get PetHouse Profile
-router.get("/profile", verifyToken, getPetHouseProfile); // Protected route with JWT middleware
+// Protected Routes
+router.get("/profile", verifyToken, getPetHouseProfile);
+router.patch("/update", verifyToken, updateProfile);
+router.get("/", getAllPetHouses);
+router.patch("/booking/:id/accept", verifyToken, acceptBooking);
+router.patch("/booking/:id/cancel", verifyToken, cancelBooking);
 
-module.exports = router; // Use module.exports instead of export default
+module.exports = router;

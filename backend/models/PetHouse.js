@@ -5,7 +5,7 @@ const petHouseSchema = new mongoose.Schema(
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    phone: { type: String, required: true },
+    phone: { type: String },
     address: {
       street: String,
       city: String,
@@ -14,17 +14,25 @@ const petHouseSchema = new mongoose.Schema(
     },
     services: [
       {
-        name: { type: String, required: true }, // e.g., "boarding"
+        name: { type: String }, // e.g., "boarding"
         options: [
           {
-            petType: { type: String, required: true }, // e.g., "small dog"
-            price: { type: Number, required: true }
+            petType: { type: String }, // e.g., "small dog"
+            price: { type: Number }
           }
         ]
       }
     ],
     bookings: [{ type: mongoose.Schema.Types.ObjectId, ref: "Booking" }],
-    rating: { type: Number, default: 0 },
+    reviews: [
+      {
+        userId: { type: mongoose.Schema.Types.ObjectId, ref: "User"},
+        comment: { type: String },
+        rating: { type: Number, required: true, min: 1, max: 5 },
+        createdAt: { type: Date, default: Date.now }
+      }
+    ],
+    rating: { type: Number, default: 0 }, // Average of all review ratings
   },
   { timestamps: true }
 );
