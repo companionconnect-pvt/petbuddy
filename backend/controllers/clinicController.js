@@ -21,7 +21,12 @@ exports.signup = async (req, res) => {
       return res.status(400).json({ message: "License file is required" });
     }
 
-    const result = await cloudinary.uploader.upload(req.file.path, {
+    // Convert buffer to base64 string
+    const base64 = req.file.buffer.toString("base64");
+    const dataUri = `data:${req.file.mimetype};base64,${base64}`;
+
+    // Upload to Cloudinary
+    const result = await cloudinary.uploader.upload(dataUri, {
       folder: "clinic_licenses",
       resource_type: "auto",
     });
