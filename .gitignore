@@ -1,38 +1,130 @@
-# Node.js
-node_modules/
-.env
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-package-lock.json
-.pnpm-debug.log*
-
 # Logs
 logs
 *.log
-*.log.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# OS/system files
-.DS_Store
-Thumbs.db
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
 
-# VSCode settings
-.vscode/
-
-# MongoDB dump files
-dump/
+# Dependency directories
+node_modules/
+**/node_modules/
 
 # Build output
 dist/
+dist-ssr/
 build/
+out/
+.temp/
+.next/
+.cache/
+.nuxt/
+.svelte-kit/
 
-# React (client folder)
-client/node_modules/
-client/build/
-client/.env
+# Environment variables
+.env
+.env.*.local
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
-# Coverage reports
+# System files
+.DS_Store
+Thumbs.db
+
+# IDEs and editors
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.code-workspace
+
+# TypeScript
+*.tsbuildinfo
+
+# Test coverage
 coverage/
+.nyc_output/
 
-# Optional
-*.swp
+# Logs for PM2 (if used in production)
+pids/
+pm2.log
+*.pm2.log
+logs/
+
+# OS generated
+ehthumbs.db
+Desktop.ini
+
+# Mac-specific
+*.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+*~
+
+# Sensitive files (security keys, etc.)
+*.pem
+*.key
+*.crt
+*.p12
+*.jks
+
+# Parcel and Vite
+.cache/
+*.parcel-cache/
+.vite/
+
+# Next.js or other meta-frameworks
+.next/
+out/
+
+# Firebase
+.firebase/
+
+# Docker
+*.container
+docker-compose.override.yml
+
+# Yarn / NPM / PNPM
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
+.pnpm-store/
+
+# Coverage and debug
+coverage/
+*.lcov
+__pycache__/
+
+# Misc
+tmp/
+temp/
+uploads/
+public/uploads/
+static/uploads/
+
+# If you're using socket.io with file adapters
+*.db
+
+# Ignore lockfiles for environments where only one package manager is used
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
