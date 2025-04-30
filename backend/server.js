@@ -7,7 +7,7 @@ require("dotenv").config();
 const clinicRoutes = require("./routes/clinicAuth");
 const petHouseAuth = require("./routes/pethouseAuth.js");
 const authRoutes = require("./routes/authRoutes.js");
-
+const driverRoutes = require("./routes/driverRoutes.js");
 const app = express();
 
 // Middleware setup
@@ -18,7 +18,7 @@ app.use(express.json()); // Parse incoming JSON requests
 app.use("/api/petclinic", clinicRoutes);
 app.use("/api/auth", authRoutes); // General user authentication routes
 app.use("/api/pethouse", petHouseAuth); // Pet house specific authentication routes
-
+app.use("/api/driver", driverRoutes);
 // MongoDB connection
 mongoose
   .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
