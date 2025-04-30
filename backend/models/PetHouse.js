@@ -12,17 +12,21 @@ const petHouseSchema = new mongoose.Schema(
       state: String,
       zip: String,
     },
-    services: [{ type: String }],
-    pricing: {
-      boarding: { type: Number, default: 0 },
-      grooming: { type: Number, default: 0 },
-      daycare: { type: Number, default: 0 },
-    },
+    services: [
+      {
+        name: { type: String, required: true }, // e.g., "boarding"
+        options: [
+          {
+            petType: { type: String, required: true }, // e.g., "small dog"
+            price: { type: Number, required: true }
+          }
+        ]
+      }
+    ],
     bookings: [{ type: mongoose.Schema.Types.ObjectId, ref: "Booking" }],
     rating: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
 
-// Use module.exports to export the PetHouse model
 module.exports = mongoose.model("PetHouse", petHouseSchema);
