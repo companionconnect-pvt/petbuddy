@@ -8,6 +8,8 @@ const clinicRoutes = require("./routes/clinicAuth");
 const petHouseAuth = require("./routes/pethouseAuth.js");
 const authRoutes = require("./routes/authRoutes.js");
 const driverRoutes = require("./routes/driverRoutes.js");
+const userRoutes = require("./routes/userRoutes");
+const petRoutes = require("./routes/petRoutes");
 const app = express();
 
 // Middleware setup
@@ -19,6 +21,8 @@ app.use("/api/petclinic", clinicRoutes);
 app.use("/api/auth", authRoutes); // General user authentication routes
 app.use("/api/pethouse", petHouseAuth); // Pet house specific authentication routes
 app.use("/api/driver", driverRoutes);
+app.use("/api/user", userRoutes);
+app.use("/api/pet", petRoutes);
 // MongoDB connection
 mongoose
   .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
