@@ -9,6 +9,12 @@ const petSchema = new mongoose.Schema(
     age: { type: Number, required: true },
     weight: { type: Number, required: true },
 
+    gender: {
+      type: String,
+      enum: ["Male", "Female"], 
+      default: "Male"
+    },
+
     medicalHistory: [
       {
         date: { type: Date, required: true },
