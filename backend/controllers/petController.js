@@ -19,18 +19,14 @@ const JWT_SECRET = "Yg#8s9iFgT!pM2nA5w@QeZ6rLp^RtZ3k";
             age,
             weight,
             gender,
-            medicalHistory
+            medicalHistory : [],
         });
         
         const savedPet = await newPet.save();
-        
-        const token = jwt.sign({ id: savedPet._id, role: "Pet"}, JWT_SECRET, {
-            expiresIn: "7d",
-        });
-
+    
         const updateUserPets = await User.findByIdAndUpdate(ownerId, { $push: { pets: newPet._id } });
 
-        res.status(201).json({ token, pet: savedPet});
+        res.status(201).json({ pet: savedPet});
     } catch (err) {
         console.error(err);
         res.status(500).json({message: "Server error"});
