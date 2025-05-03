@@ -8,7 +8,9 @@ const signup = async (req, res) => {
   try {
     const { name, email, password } = req.body;
     if (!name || !email || !password) {
-      return res.status(400).json({ message: "Name, email, and password are required" });
+      return res
+        .status(400)
+        .json({ message: "Name, email, and password are required" });
     }
 
     const existingPetHouse = await PetHouse.findOne({ email });
@@ -26,9 +28,13 @@ const signup = async (req, res) => {
 
     const savedPetHouse = await newPetHouse.save();
 
-    const token = jwt.sign({ id: savedPetHouse._id, role: "pethouse" }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
+    const token = jwt.sign(
+      { id: savedPetHouse._id, role: "pethouse" },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d",
+      }
+    );
 
     res.status(201).json({ token, petHouse: savedPetHouse });
   } catch (err) {
@@ -43,14 +49,20 @@ const login = async (req, res) => {
     const { email, password } = req.body;
 
     const petHouse = await PetHouse.findOne({ email });
-    if (!petHouse) return res.status(400).json({ message: "Invalid credentials" });
+    if (!petHouse)
+      return res.status(400).json({ message: "Invalid credentials" });
 
     const isMatch = await bcrypt.compare(password, petHouse.password);
-    if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
+    if (!isMatch)
+      return res.status(400).json({ message: "Invalid credentials" });
 
-    const token = jwt.sign({ id: petHouse._id, role: "pethouse" }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
+    const token = jwt.sign(
+      { id: petHouse._id, role: "pethouse" },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d",
+      }
+    );
 
     res.status(200).json({ token, petHouse });
   } catch (err) {
@@ -63,7 +75,8 @@ const login = async (req, res) => {
 const getPetHouseProfile = async (req, res) => {
   try {
     const petHouse = await PetHouse.findById(req.user.id);
-    if (!petHouse) return res.status(404).json({ message: "PetHouse not found" });
+    if (!petHouse)
+      return res.status(404).json({ message: "PetHouse not found" });
 
     res.status(200).json(petHouse);
   } catch (err) {
@@ -87,6 +100,8 @@ const updateProfile = async (req, res) => {
 
 // Get All PetHouses (Public)
 const getAllPetHouses = async (req, res) => {
+  console.log("Fetch all pet houses request initiated");
+
   try {
     const petHouses = await PetHouse.find();
     res.status(200).json(petHouses);
@@ -128,7 +143,7 @@ const cancelBooking = async (req, res) => {
   }
 };
 
-// rate pethouse 
+// rate pethouse
 const ratePetHouse = async (req, res) => {
   try {
     const { rating, comment } = req.body;
@@ -136,7 +151,8 @@ const ratePetHouse = async (req, res) => {
     const petHouseId = req.params.id;
 
     const petHouse = await PetHouse.findById(petHouseId);
-    if (!petHouse) return res.status(404).json({ message: "Pet house not found" });
+    if (!petHouse)
+      return res.status(404).json({ message: "Pet house not found" });
 
     // Check if user has already reviewed
     const existingReviewIndex = petHouse.reviews.findIndex(
@@ -158,7 +174,9 @@ const ratePetHouse = async (req, res) => {
 
     await petHouse.save();
 
-    res.status(200).json({ message: "Review submitted", averageRating: petHouse.rating });
+    res
+      .status(200)
+      .json({ message: "Review submitted", averageRating: petHouse.rating });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Error submitting review" });

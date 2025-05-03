@@ -6,7 +6,7 @@ const {
   updateProfile,
   getAllPetHouses,
   acceptBooking,
-  cancelBooking
+  cancelBooking,
 } = require("../controllers/pethouseController");
 const verifyToken = require("../middlewares/auth");
 
