@@ -43,22 +43,54 @@ const Signup = () => {
     }
   };
 
+  const fields = [
+    { name: "name", label: "Name" },
+    { name: "email", label: "Email" },
+    { name: "phoneNumber", label: "Phone Number" },
+    { name: "password", label: "Password", type: "password" },
+    { name: "street", label: "Street" },
+    { name: "city", label: "City" },
+    { name: "state", label: "State" },
+    { name: "zip", label: "ZIP Code" },
+    { name: "upi", label: "UPI ID" }
+  ];
+
   return (
-    <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-10 space-y-3">
-      <h2 className="text-xl font-bold">Signup</h2>
-      {["name", "email", "phoneNumber", "password", "street", "city", "state", "zip", "upi"].map((field) => (
-        <input
-          key={field}
-          type={field === "password" ? "password" : "text"}
-          name={field}
-          placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-          value={form[field]}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
-      ))}
-      <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Signup</button>
-    </form>
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-100 to-blue-200 p-4">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white shadow-2xl rounded-3xl p-10 w-full max-w-3xl transition-all duration-300 hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)]"
+      >
+        <h2 className="text-3xl font-bold text-center text-indigo-700 mb-8">Sign Up</h2>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {fields.map(({ name, label, type }) => (
+            <div key={name} className="flex flex-col">
+              <label htmlFor={name} className="mb-1 text-sm font-medium text-gray-700">
+                {label}
+              </label>
+              <input
+                type={type || "text"}
+                id={name}
+                name={name}
+                value={form[name]}
+                onChange={handleChange}
+                className="px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                placeholder={`Enter ${label}`}
+                required
+              />
+            </div>
+          ))}
+        </div>
+
+        <button
+          type="submit"
+          className="mt-8 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl shadow-md transition duration-300"
+        >
+          Create Account
+        </button>
+      </form>
+    </div>
   );
 };
 
