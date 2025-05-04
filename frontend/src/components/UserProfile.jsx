@@ -6,12 +6,17 @@ import binIcon from "../assets/trash-bin-trash-svgrepo-com.svg";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiUser, FiMail, FiPhone, FiMapPin, FiPlus, FiCalendar } from "react-icons/fi";
 import { RiShieldUserLine } from "react-icons/ri";
+import ChatbotModal from "./chatbotModal";
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);
   const [editingField, setEditingField] = useState(null);
   const [editValue, setEditValue] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedPet, setSelectedPet] = useState(null);
+  const [showPetCard, setShowPetCard] = useState(false);
+  const [showChatbot, setShowChatbot] = useState(false);
+  const [chatPet, setChatPet] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -73,6 +78,92 @@ const UserProfile = () => {
     } catch (err) {
       alert(err.response?.data?.message || "Update failed");
     }
+  };
+  const handleChatClick = pet => {
+    setChatPet(pet);
+    setShowChatbot(true);
+  };
+  const PetCard = ({ pet, onClose }) => {
+    return (
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+        onClick={onClose}
+      >
+        <motion.div 
+          initial={{ scale: 0.9 }}
+          animate={{ scale: 1 }}
+          className="bg-white rounded-2xl p-8 w-full max-w-md mx-4"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex justify-between items-start mb-6">
+            <h3 className="text-2xl font-bold text-gray-900">{pet.name}</h3>
+            <button 
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              ✕
+            </button>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <div>
+              <p className="text-sm text-gray-500">Species</p>
+              <p className="font-medium capitalize">{pet.species}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Breed</p>
+              <p className="font-medium capitalize">{pet.breed}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Age</p>
+              <p className="font-medium">{pet.age} years</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Weight</p>
+              <p className="font-medium">{pet.weight} kg</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Gender</p>
+              <p className="font-medium capitalize">{pet.gender}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Medical History</p>
+              <p className="font-medium capitalize">Date: {pet.medicalHistory.date}</p>
+              <p className="font-medium capitalize">Description: {pet.medicalHistory.decription}</p>
+              <p className="font-medium capitalize">Doctor: {pet.medicalHistory.doctor}</p>
+              <p className="font-medium capitalize">Treatment: {pet.medicalHistory.treatment}</p>
+            </div>
+          </div>
+  
+          <div className="flex space-x-3">
+            <button
+              onClick={() => handleChatClick(pet)}
+              className="px-4 py-2 text-[#F27781] border border-[#F27781] rounded-lg hover:bg-[#F27781] hover:text-white transition-colors duration-200"
+            >
+              Chat
+            </button>
+            <button
+              onClick={() => navigate(`/editPet/${pet._id}`)}
+              className="px-4 py-2 text-[#F27781] border border-[#F27781] rounded-lg hover:bg-[#F27781] hover:text-white transition-colors duration-200"
+            >
+              Edit
+            </button>
+            <button
+              onClick={() => {
+                handleRemovePet(pet._id);
+                onClose();
+              }}
+              className="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors duration-200"
+            >
+              Delete
+            </button>
+          </div>
+        </motion.div>
+      </motion.div>
+    );
   };
 
   const renderEditableField = (label, fieldName, value, icon) => (
@@ -284,9 +375,17 @@ const UserProfile = () => {
                       </div>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-start">
+                      <div className="flex justify-between items-start"
+                      onClick={() => {
+                        setSelectedPet(pet);
+                        setShowPetCard(true);
+                        }}>
                         <div>
-                          <p className="text-lg font-semibold text-gray-900 truncate">{pet.name}</p>
+                        <p 
+                          className="text-lg font-semibold text-gray-900 truncate"
+                        >
+                        {pet.name}
+                        </p>
                           <p className="text-sm text-gray-500 capitalize">
                             {pet.species} • {pet.breed}
                           </p>
@@ -424,6 +523,20 @@ const UserProfile = () => {
           )}
         </motion.div>
       </div>
+      <AnimatePresence>
+  {showPetCard && (
+    <PetCard 
+      key = {selectedPet?._id ?? "petcard"}
+      pet={selectedPet} 
+      onClose={() => setShowPetCard(false)} 
+    />
+  )}
+  </AnimatePresence>
+  <ChatbotModal
+  pet={chatPet}
+  isOpen={showChatbot}
+  onClose={() => setShowChatbot(false)}
+/>
     </div>
   );
 };

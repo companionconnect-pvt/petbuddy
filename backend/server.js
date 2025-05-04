@@ -12,6 +12,7 @@ const authRoutes = require("./routes/authRoutes.js");
 const driverRoutes = require("./routes/driverRoutes.js");
 const userRoutes = require("./routes/userRoutes");
 const petRoutes = require("./routes/petRoutes");
+const chatBotRoutes  = require("./routes/chatbotRoutes.js");
 const setupVideoCall = require("./socket/videoCall"); // 👈 import video call logic
 
 const app = express();
@@ -34,6 +35,7 @@ app.use("/api/pethouse", petHouseAuth);
 app.use("/api/driver", driverRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/pet", petRoutes);
+app.use("/api/chatbot", chatBotRoutes);
 
 // MongoDB + Start server
 mongoose
