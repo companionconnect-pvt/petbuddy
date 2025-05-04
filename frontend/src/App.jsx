@@ -9,8 +9,8 @@ import EditPet from "./components/EditPet";
 import UserDashboard from "./components/UserDashboard";
 import Layout from "./components/Layout"; // Layout with Navbar
 import Home from "./components/Home"; // Homepage
-
-import VideoCallRoom from "./components/VideoCallRoom"; // update path as needed
+import VideoCallRoom from "./components/VideoCallRoom"; // update path as neededX
+import Chat from "./components/Chat";
 
 
 
@@ -33,6 +33,7 @@ function App() {
           <Route path="/editpet/:petId" element={<EditPet />} />
           <Route path="/userDashboard" element={<UserDashboard />} />
           <Route path="/video-call" element={<VideoCallRoom />} />
+          <Route path="/chat/:ticketId" element={<Chat />} />
         </Route>
 
         {/* Catch-all route */}
