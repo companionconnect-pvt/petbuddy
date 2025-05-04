@@ -104,16 +104,20 @@ exports.signup = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
-  const { email, password } = req.body;
-  console.log(email, password);
+  console.log("hii");
+  console.log("Login attempt with:", req.body);
+
+  // const { email, password } = req.body;
+  
   try {
    const { email, password } = req.body;
-   
+   console.log("Trying to find driver with email:", email);
+
        const driver = await Driver.findOne({ email });
        if (!driver) {
          return res.status(400).json({ message: "Invalid credentials" });
        }
-   
+       
        // Compare passwords
        const isMatch = await bcrypt.compare(password, driver.passwordHash);
        if (!isMatch) {
@@ -124,7 +128,7 @@ exports.login = async (req, res) => {
        const token = jwt.sign({ id: driver._id, role: "driver" }, JWT_SECRET, {
          expiresIn: "7d",
        });
-   
+       console.log(driver);
        res.status(200).json({ token, driver });
      } catch (err) {
        console.error(err);
@@ -148,6 +152,26 @@ exports.updateDriver = async (req, res) => {
     res.status(200).json({ message: "Driver updated successfully", driver: updatedDriver });
   } catch (err) {
     console.error("Update error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+exports.getCurrentDriver = async (req, res) => {
+  try {
+    console.log("hello");
+    // Fetch the current driver's details using the driver ID from the JWT
+    const driver = await Driver.findById(req.user.id)
+      .populate("vehicle")  // Assuming you might want to populate related vehicle data, adjust as needed
+      .populate("license")  // Similarly, populate the license if needed
+      .populate("name")
+      .populate("email")
+      // Exclude password hash
+    console.log(driver);
+    if (!driver) {
+      return res.status(404).json({ message: "Driver not found" });
+    }   
+    res.status(200).json({ driver });
+  } catch (err) {
+    console.error("Fetch Current Driver Error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };

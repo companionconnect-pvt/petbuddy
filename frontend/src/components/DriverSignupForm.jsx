@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const DriverSignupForm = () => {
+  const navigate = useNavigate();
+
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -13,7 +16,8 @@ const DriverSignupForm = () => {
     licenseNumber: '',
     licenseExpiry: '',
     adharNumber: '',
-    currentLocation: "28.61,77.20", // Example: "28.61,77.20"
+    currentLocation: "28.61,77.20",
+    upiId:'',
   });
 
   const [files, setFiles] = useState({
@@ -22,109 +26,120 @@ const DriverSignupForm = () => {
     vehiclePhoto: null,
   });
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setForm((prevForm) => ({
+          ...prevForm,
+          currentLocation: `${latitude},${longitude}`,
+        }));
+      },
+      (error) => {
+        console.error('Error fetching location:', error);
+        alert("Couldn't fetch location. Please allow location access.");
+      }
+    );
+  }, []);
+  
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleFileChange = (e) => setFiles({ ...files, [e.target.name]: e.target.files[0] });
 
-  const handleFileChange = (e) => {
-    setFiles({ ...files, [e.target.name]: e.target.files[0] });
-  };
-
- 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
-    
-    // Log form and files to check their content before appending to FormData
-    console.log('Form Data:', form);
-    console.log('Files:', files);
-  
+
     Object.entries(form).forEach(([key, value]) => {
-      if (value) {  // Ensure only non-empty values are added
-        formData.append(key, value);
-      }
+      if (value) formData.append(key, value);
     });
-  
+
     Object.entries(files).forEach(([key, file]) => {
-      if (file) {
-        console.log(`Adding file for ${key}:`, file);
-        formData.append(key, file);
-      }
+      if (file) formData.append(key, file);
     });
-  
-    // Log formData to ensure correct values are being appended
-    for (let pair of formData.entries()) {
-      console.log(pair[0] + ': ' + pair[1]);
-    }
-  
+
     try {
       const res = await fetch('http://localhost:5000/api/driver/signup', {
         method: 'POST',
         body: formData,
       });
-  
+    
       const data = await res.json();
-      console.log('Signup Response:', data);
-      alert(data.message || 'Driver registered!');
+    
+      if (res.ok) {
+        alert(data.message || 'Driver registered!');
+        navigate('/');
+      } else {
+        alert(data.message || 'Signup failed');
+      }
     } catch (err) {
-      console.error('Signup Error:', err);
       alert('Signup failed');
     }
-  };
+  }
+    
+  const formFields = [
+    'name', 'email', 'password', 'phone',
+    'vehicleType', 'vehicleModel', 'vehicleNumber', 'vehicleCapacity',
+    'licenseNumber', 'licenseExpiry', 'adharNumber',
+    'upiId', 
+    'currentLocation',
+  ];
   
+
+  const fileFields = [
+    { label: 'License Photo', name: 'licensePhoto' },
+    { label: 'Adhar Photo', name: 'adharPhoto' },
+    { label: 'Vehicle Photo', name: 'vehiclePhoto' },
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-100 to-blue-200 p-4">
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-xl shadow-md w-full max-w-2xl space-y-4"
+        className="bg-white shadow-2xl rounded-3xl p-10 w-full max-w-3xl transition-all duration-300 hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)]"
       >
-        <h2 className="text-2xl font-bold text-center text-gray-800">Driver Signup</h2>
+        <h2 className="text-3xl font-bold text-center text-indigo-700 mb-8">Driver Sign Up</h2>
 
-        {[
-          'name', 'email', 'password', 'phone',
-          'vehicleType', 'vehicleModel', 'vehicleNumber', 'vehicleCapacity',
-          'licenseNumber', 'licenseExpiry', 'adharNumber', 'currentLocation'
-        ].map((field) => (
-          <div key={field}>
-            <label className="block mb-1 capitalize text-sm font-medium text-gray-700">
-              {field.replace(/([A-Z])/g, ' $1')}
-            </label>
-            <input
-              type={field === 'password' ? 'password' : 'text'}
-              name={field}
-              value={form[field]}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-        ))}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {formFields.map((field) => (
+            <div key={field} className="flex flex-col">
+              <label htmlFor={field} className="mb-1 text-sm font-medium text-gray-700 capitalize">
+                {field.replace(/([A-Z])/g, ' $1')}
+              </label>
+              <input
+                type={field === 'password' ? 'password' : 'text'}
+                id={field}
+                name={field}
+                value={form[field]}
+                onChange={handleChange}
+                required
+                className="px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                placeholder={`Enter ${field.replace(/([A-Z])/g, ' $1')}`}
+              />
+            </div>
+          ))}
 
-        {[
-          { label: 'License Photo', name: 'licensePhoto' },
-          { label: 'Adhar Photo', name: 'adharPhoto' },
-          { label: 'Vehicle Photo', name: 'vehiclePhoto' },
-        ].map(({ label, name }) => (
-          <div key={name}>
-            <label className="block mb-1 text-sm font-medium text-gray-700">
-              {label}
-            </label>
-            <input
-              type="file"
-              name={name}
-              accept="image/*"
-              onChange={handleFileChange}
-              required
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-        ))}
+          {fileFields.map(({ label, name }) => (
+            <div key={name} className="flex flex-col">
+              <label htmlFor={name} className="mb-1 text-sm font-medium text-gray-700">
+                {label}
+              </label>
+              <input
+                type="file"
+                name={name}
+                accept="image/*"
+                onChange={handleFileChange}
+                required
+                className="px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              />
+            </div>
+          ))}
+        </div>
 
         <button
           type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold transition duration-200"
+          className="mt-8 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl shadow-md transition duration-300"
         >
-          Sign Up Driver
+          Create Driver Account
         </button>
       </form>
     </div>
