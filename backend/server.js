@@ -14,6 +14,7 @@ const userRoutes = require("./routes/userRoutes");
 const petRoutes = require("./routes/petRoutes");
 const setupVideoCall = require("./socket/videoCall");  // Import video call logic
 const chatRoutes = require("./routes/chatRoutes.js");
+const chatBotRoutes  = require("./routes/chatbotRoutes.js");
 
 // Initialize app and server
 const app = express();
@@ -37,6 +38,7 @@ app.use("/api/driver", driverRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/pet", petRoutes);
 app.use("/api/chat", chatRoutes); // Chat route
+app.use("/api/chatbot", chatBotRoutes);
 
 // MongoDB connection
 mongoose

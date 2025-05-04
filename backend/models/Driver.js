@@ -24,8 +24,9 @@ const driverSchema = new mongoose.Schema({
     adharNumber: { type: String, required: true },
     photoUrl: { type: String },
   },
+  upiId: { type: String },
   status: { type: String, enum: ['active', 'inactive', 'suspended'], default: 'active' },
-  currentLocation: { type: [Number]}, // [latitude, longitude]
+ // currentLocation: { type: [Number]}, // [latitude, longitude]
   assignedTrips: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Trip' }],
   completedTrips: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Trip' }],
   totalEarnings: { total: { type: Number, default: 0 }, currency: { type: String, default: 'INR' }, lastPayouts: { type: Date } },
