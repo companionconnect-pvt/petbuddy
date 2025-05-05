@@ -12,13 +12,17 @@ const bookingSchema = new mongoose.Schema(
       ref: "PetHouse",
       required: true,
     },
-    petId: { type: mongoose.Schema.Types.ObjectId, ref: "Pet", required: true },
+    petId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Pet",
+      required: true,
+    },
 
     serviceType: [
       {
-        name: { type: String, required: true }, // e.g., "boarding"
-        petType: { type: String }, // e.g., "small dog"
-        price: { type: Number }, // optional, to store snapshot at booking time
+        name: { type: String, required: true },
+        petType: { type: String },
+        price: { type: Number },
       },
     ],
 
@@ -39,6 +43,28 @@ const bookingSchema = new mongoose.Schema(
         enum: ["pending", "paid", "failed"],
         default: "pending",
       },
+    },
+
+    source: {
+      address: {
+        street: { type: String, required: true },
+        city: { type: String, required: true },
+        state: { type: String, required: true },
+        zip: { type: String, required: true },
+      },
+      latitude: { type: Number, required: true },
+      longitude: { type: Number, required: true },
+    },
+
+    destination: {
+      address: {
+        street: { type: String, required: true },
+        city: { type: String, required: true },
+        state: { type: String, required: true },
+        zip: { type: String, required: true },
+      },
+      latitude: { type: Number, required: true },
+      longitude: { type: Number, required: true },
     },
   },
   { timestamps: true }
