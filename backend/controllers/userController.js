@@ -2,7 +2,8 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Pet = require('../models/Pet'); 
-const Booking = require('../models/BookingPethouse'); 
+const Booking = require('../models/BookingPethouse');
+const Consultation = require("../models/Consultation"); 
 
 const JWT_SECRET = "Yg#8s9iFgT!pM2nA5w@QeZ6rLp^RtZ3k";
 
@@ -10,7 +11,8 @@ const getCurrentUser = async (req, res) => {
   try {
     const user = await User.findById(req.user.id)
     .populate("pets")
-    .populate("bookings");
+    .populate("bookings")
+    .populate("consultations");
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }

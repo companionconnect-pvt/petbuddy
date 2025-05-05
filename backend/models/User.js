@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema({
   },
   pets: [{ type: mongoose.Schema.Types.ObjectId, ref: "Pet" }],
   bookings: [{ type: mongoose.Schema.Types.ObjectId, ref: "Booking" }],
+  consultations: [{ type: mongoose.Schema.Types.ObjectId, ref: "Consultation"}],
   paymentMethods: [{
     methodType: { type: String }, // e.g., 'UPI', 'Card'
     details: { type: String },    // e.g., UPI ID or masked card number

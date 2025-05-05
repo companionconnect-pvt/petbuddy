@@ -7,10 +7,11 @@ const consultationSchema = new mongoose.Schema(
     petId: { type: mongoose.Schema.Types.ObjectId, ref: "Pet", required: true },
 
     appointmentDate: { type: Date, required: true },
+    appointmentTime: { type: String, required: true },
 
     mode: {
       type: String,
-      enum: ["inperson", "videocall"],
+      enum: ["In-Person", "Video-Call", "video-call", "in-person"],
       required: true
     },
 
@@ -23,12 +24,12 @@ const consultationSchema = new mongoose.Schema(
     notes: { type: String },
 
     payment: {
-      amount: { type: Number, required: true },
-      method: { type: String, enum: ["upi", "card", "cash"], required: true },
+      amount: { type: Number, required: true, default: 0 },
+      method: { type: String, enum: ["upi", "card", "cash", "UPI", "Card", "Cash"], required: true },
       status: { type: String, enum: ["pending", "paid", "failed"], default: "pending" }
     }
   },
-  { timestamps: true }
+  { timestamps: true, default: Date.now }
 );
 
 module.exports = mongoose.model("Consultation", consultationSchema);

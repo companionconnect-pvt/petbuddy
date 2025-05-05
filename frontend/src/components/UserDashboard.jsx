@@ -4,8 +4,8 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import BookingModal from "./BookPethouseModal";
-import ClinicModal from "./BookClinicModal";
-
+import PetClinicModal from "./PetClinicModal";
+import ClinicBookingModal from "./ClinicBookingModal"; // Import the ClinicBookingModal
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
@@ -25,22 +25,20 @@ const UserDashboard = () => {
   const [clinics, setClinics] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("pethouses");
-
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
-
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
-  const [bookingType, setBookingType] = useState("pethouse");
+  const [modalType, setModalType] = useState(null); // 'pethouse-info' | 'clinic-info' | 'pethouse-booking' | 'clinic-booking'
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const pethouseRes = await API.get("/pethouse/");
-        const clinicRes = await API.get("/petclinic/");
-
-        console.log(clinicRes.data);
-        setPethouses(pethouseRes.data); // Correct
-        setClinics(clinicRes.data); // Correct
+        const [pethouseRes, clinicRes] = await Promise.all([
+          API.get("/pethouse/"),
+          API.get("/petclinic/")
+        ]);
+        setPethouses(pethouseRes.data);
+        setClinics(clinicRes.data);
       } catch (err) {
         console.error("Failed to fetch data:", err);
       } finally {
@@ -62,21 +60,23 @@ const UserDashboard = () => {
     );
   };
 
-  const openModal = (item, type) => {
-    setSelectedItem({ ...item, type });
+  const openInfoModal = (item, type) => {
+    setSelectedItem(item);
     setModalIsOpen(true);
+    setModalType(`${type}-info`);
   };
 
   const openBookingModal = (item, type) => {
-    setSelectedItem({ ...item, type });
-    setBookingType(type);
+    setSelectedItem(item);
     setBookingModalOpen(true);
+    setModalType(`${type}-booking`);
   };
 
   const closeModals = () => {
     setModalIsOpen(false);
     setBookingModalOpen(false);
     setSelectedItem(null);
+    setModalType(null);
   };
 
   const renderCard = (item, type) => (
@@ -92,7 +92,6 @@ const UserDashboard = () => {
         {item.address?.zip}
       </p>
 
-      {/* Map */}
       {item.location?.latitude && item.location?.longitude && (
         <div className="my-3 rounded overflow-hidden">
           <MapContainer
@@ -118,24 +117,29 @@ const UserDashboard = () => {
         </div>
       )}
 
-      <div className="mt-2">
-        <h3 className="font-semibold text-sm">Services & Pricing:</h3>
-        <ul className="ml-4 list-disc text-sm text-gray-700"></ul>
-      </div>
+      {type === "clinic" && item.clinicAddress?.openingHours && (
+        <div className="mt-2">
+          <h3 className="font-semibold text-sm">Opening Hours:</h3>
+          <p className="text-sm text-gray-600 mb-1">
+            {item.clinicAddress.openingHours} - {item.clinicAddress.closingHours}
+          </p>
+        </div>
+      )}
 
       <div className="mt-3 text-sm">
         <span className="font-semibold">Rating:</span>{" "}
         {item.rating ? renderStars(item.rating) : "No ratings yet"}
       </div>
 
-      <div className="mt-3 text-xs text-gray-500">
-        <p>Created at: {new Date(item.createdAt).toLocaleString()}</p>
-        <p>Updated at: {new Date(item.updatedAt).toLocaleString()}</p>
-      </div>
-
       <div className="mt-4 flex justify-between">
         <button
-          className="px-4 py-2 bg-[#F27781] hover:bg-[#e76872] text-white rounded-md"
+          className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
+          onClick={() => openInfoModal(item, type)}
+        >
+          Know More
+        </button>
+        <button
+          className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition"
           onClick={() => openBookingModal(item, type)}
         >
           Book Now
@@ -148,8 +152,10 @@ const UserDashboard = () => {
     return <div className="text-center mt-10 text-lg">Loading...</div>;
 
   return (
-    <div className="bg-[#FAF9F6] min-h-screen font-sans text-[#222222]">
-      <div className="max-w-7xl mx-auto px-6 py-20">
+    <div className="flex flex-col lg:flex-row h-screen">
+      <div className="w-full lg:w-1/2 overflow-y-auto p-6">
+        <h1 className="text-2xl font-bold mb-4">Available Services</h1>
+        
         <div className="mb-4">
           <button
             onClick={() => setActiveTab("pethouses")}
@@ -174,27 +180,43 @@ const UserDashboard = () => {
         </div>
 
         <div className="flex flex-col items-start gap-4">
-          {activeTab === "pethouses"
-            ? pethouses.map((house) => renderCard(house, "pethouse"))
-            : clinics.map((clinic) => renderCard(clinic, "clinic"))}
+          {activeTab === "pethouses" ? (
+            pethouses.map((house) => renderCard(house, "pethouse"))
+          ) : (
+            clinics.map((clinic) => renderCard(clinic, "clinic"))
+          )}
         </div>
       </div>
 
-      {selectedItem && modalIsOpen && selectedItem.type === "clinic" && (
-        <ClinicModal
-          clinic={selectedItem}
+      {/* Modals */}
+      {selectedItem && modalIsOpen && modalType === "clinic-info" && (
+        <PetClinicModal
+          petClinic={selectedItem}
           isOpen={modalIsOpen}
           onClose={closeModals}
         />
       )}
 
-      {selectedItem && bookingModalOpen && bookingType === "pethouse" && (
+      {selectedItem && bookingModalOpen && modalType === "pethouse-booking" && (
         <BookingModal
           petHouse={selectedItem}
           isOpen={bookingModalOpen}
           onClose={closeModals}
         />
       )}
+
+{selectedItem && bookingModalOpen && modalType === "clinic-booking" && (
+  console.log('Modal props:', {
+    isOpen: bookingModalOpen,
+    petClinic: selectedItem,
+    modalType
+  }),
+  <ClinicBookingModal
+    petClinic={selectedItem}
+    isOpen={bookingModalOpen}
+    onClose={closeModals}
+  />
+)}
     </div>
   );
 };

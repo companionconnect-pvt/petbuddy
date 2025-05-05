@@ -1,4 +1,5 @@
 const Booking = require("../models/BookingPethouse");
+const User = require("../models/User");
 
 // 1. Create a booking (already implemented)
 
@@ -31,7 +32,9 @@ exports.createBooking = async (req, res) => {
     });
 
     await newBooking.save();
-
+    const updateUserBookings = await User.findbyIdAndUpdate(userId, {
+      $push: { bookings : newBooking._id }
+    });
     res
       .status(201)
       .json({ message: "Booking created successfully", booking: newBooking });

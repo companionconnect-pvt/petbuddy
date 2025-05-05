@@ -12,8 +12,12 @@ exports.signup = async (req, res) => {
       phone,
       specialization,
       experience,
-      address,
+      street,
+      city,
+      state,
+      zip,
       openingHours,
+      closingHours,
       registeredName,
     } = req.body;
 
@@ -56,9 +60,15 @@ exports.signup = async (req, res) => {
       },
       specialization,
       experience,
+      address : {
+        street,
+        city,
+        state,
+        zip,
+      },
       clinicAddress: {
-        address,
         openingHours,
+        closingHours,
         registeredName,
       },
     });

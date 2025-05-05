@@ -6,7 +6,7 @@ require("dotenv").config();
 const http = require("http");
 const { Server } = require("socket.io");
 
-const clinicRoutes = require("./routes/clinicAuth");
+const clinicRoutes = require("./routes/clinicAuth.js");
 const petHouseAuth = require("./routes/pethouseAuth.js");
 const authRoutes = require("./routes/authRoutes.js");
 const driverRoutes = require("./routes/driverRoutes.js");
@@ -16,6 +16,7 @@ const setupVideoCall = require("./socket/videoCall"); // Import video call logic
 const chatRoutes = require("./routes/chatRoutes.js");
 const chatBotRoutes = require("./routes/chatbotRoutes.js");
 const bookingRoutes = require("./routes/bookingRoutes.js");
+const consultationRoutes = require("./routes/consultationRoutes.js"); 
 
 const app = express();
 const server = http.createServer(app);
@@ -40,6 +41,7 @@ app.use("/api/pet", petRoutes);
 app.use("/api/booking", bookingRoutes);
 app.use("/api/chat", chatRoutes); // Chat route
 app.use("/api/chatbot", chatBotRoutes);
+app.use("/api/consultation", consultationRoutes);
 // MongoDB connection
 mongoose
   .connect(process.env.MONGO_URI, {

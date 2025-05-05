@@ -18,10 +18,16 @@ const petClinicSchema = new mongoose.Schema(
 
     specialization: { type: String, required: true },
     experience: { type: Number, required: true }, // in years
-
+    address: { 
+      street: { type: String, required: true },
+      city: { type: String, required: true },
+      state: { type: String, required: true },
+      zip: { type: String, required: true },
+    },
     clinicAddress: {
-      address: { type: String, required: true },
+      amount: { type: Number, required: true, default: 0 },
       openingHours: { type: String, required: true }, // e.g., "9am - 5pm"
+      closingHours: { type: String, required: true },
       registeredName: { type: String, required: true },
     },
 

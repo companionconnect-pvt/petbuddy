@@ -24,6 +24,8 @@ const UserProfile = () => {
   const [showPetCard, setShowPetCard] = useState(false);
   const [showChatbot, setShowChatbot] = useState(false);
   const [chatPet, setChatPet] = useState(null);
+  const [selectedConsultation, setSelectedConsultation] = useState(null);
+  const [showConsultationCard, setShowConsultationCard] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -177,6 +179,164 @@ const UserProfile = () => {
               className="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors duration-200"
             >
               Delete
+            </button>
+          </div>
+        </motion.div>
+      </motion.div>
+    );
+  };
+
+  const ConsultationCard = ({ consultation, onClose }) => {
+    // Find the pet associated with this consultation
+    const pet = user.pets.find(p => p._id === consultation.petId);
+  
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+        onClick={onClose}
+      >
+        <motion.div
+          initial={{ scale: 0.9 }}
+          animate={{ scale: 1 }}
+          className="bg-white rounded-2xl p-8 w-full max-w-md mx-4"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex justify-between items-start mb-6">
+            <div>
+              <h3 className="text-2xl font-bold text-gray-900">
+                {consultation.mode} Consultation
+              </h3>
+              {pet && (
+                <p className="text-gray-600">
+                  For {pet.name} ({pet.breed})
+                </p>
+              )}
+            </div>
+            <button
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              ✕
+            </button>
+          </div>
+  
+          <div className="space-y-4 mb-6">
+            <div className="flex items-start">
+              <div className="p-2 rounded-lg bg-blue-50 text-blue-600 mr-3">
+                <FiCalendar size={18} />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Date & Time</p>
+                <p className="font-medium">
+                  {new Date(consultation.appointmentDate).toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                  {consultation.appointmentTime && ` at ${consultation.appointmentTime}`}
+                </p>
+              </div>
+            </div>
+  
+            <div className="flex items-start">
+              <div className="p-2 rounded-lg bg-purple-50 text-purple-600 mr-3">
+                <RiShieldUserLine size={18} />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Status</p>
+                <p className={`font-medium capitalize ${
+                  consultation.status === 'confirmed' ? 'text-green-600' :
+                  consultation.status === 'pending' ? 'text-yellow-600' :
+                  consultation.status === 'cancelled' ? 'text-red-600' : ''
+                }`}>
+                  {consultation.status}
+                </p>
+              </div>
+            </div>
+  
+            {consultation.mode === "in-person" && (
+              <div className="flex items-start">
+                <div className="p-2 rounded-lg bg-green-50 text-green-600 mr-3">
+                  <FiMapPin size={18} />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Location</p>
+                  <p className="font-medium">
+                    {consultation.petClinicId?.name || 'Clinic name not available'}
+                  </p>
+                  {consultation.petClinicId?.clinicAddress && (
+                    <p className="text-gray-600 text-sm">
+                      {consultation.petClinicId.clinicAddress.street}, {consultation.petClinicId.clinicAddress.city}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+  
+            {consultation.payment && (
+              <div className="flex items-start">
+                <div className="p-2 rounded-lg bg-amber-50 text-amber-600 mr-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" />
+                    <path fillRule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Payment</p>
+                  <p className="font-medium">
+                    {consultation.payment.amount ? `₹${consultation.payment.amount}` : 'No fee specified'}
+                  </p>
+                  <p className="text-gray-600 text-sm capitalize">
+                    {consultation.payment.method} ({consultation.payment.status})
+                  </p>
+                </div>
+              </div>
+            )}
+  
+            {consultation.notes && (
+              <div className="flex items-start">
+                <div className="p-2 rounded-lg bg-gray-50 text-gray-600 mr-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Notes</p>
+                  <p className="font-medium text-gray-600">
+                    {consultation.notes}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+  
+          <div className="flex space-x-3 pt-4 border-t border-gray-100">
+            {consultation.status === 'pending' && (
+              <button
+                onClick={() => {
+                  // Add cancel functionality here
+                  alert('Cancel functionality would go here');
+                }}
+                className="flex-1 px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors duration-200"
+              >
+                Cancel Appointment
+              </button>
+            )}
+            <button
+              onClick={() => {
+                // Add reschedule functionality here
+                alert('Reschedule functionality would go here');
+              }}
+              className={`flex-1 px-4 py-2 text-[#F27781] border border-[#F27781] rounded-lg hover:bg-[#F27781] hover:text-white transition-colors duration-200 ${
+                consultation.status === 'cancelled' ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+              disabled={consultation.status === 'cancelled'}
+            >
+              Reschedule
             </button>
           </div>
         </motion.div>
@@ -409,7 +569,11 @@ const UserProfile = () => {
                   whileHover={{ scale: 1.01 }}
                   className="border border-gray-200 rounded-xl p-5 hover:shadow-xs transition-all duration-300"
                 >
-                  <div className="flex items-start space-x-4">
+                  <div className="flex items-start space-x-4"
+                  onClick={() => {
+                    setSelectedPet(pet);
+                    setShowPetCard(true);
+                  }}>
                     <div className="flex-shrink-0">
                       <div className="h-14 w-14 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
                         {pet.photo ? (
@@ -428,10 +592,6 @@ const UserProfile = () => {
                     <div className="flex-1 min-w-0">
                       <div
                         className="flex justify-between items-start"
-                        onClick={() => {
-                          setSelectedPet(pet);
-                          setShowPetCard(true);
-                        }}
                       >
                         <div>
                           <p className="text-lg font-semibold text-gray-900 truncate">
@@ -508,7 +668,7 @@ const UserProfile = () => {
               <p className="text-gray-500">View and manage appointments</p>
             </div>
             <button
-              onClick={() => navigate("/services")}
+              onClick={() => navigate("/userDashboard")}
               className="flex items-center space-x-2 px-5 py-3 bg-gradient-to-r text-[#F27781] border border-[#F27781] rounded-lg hover:bg-[#F27781] hover:text-white transition-all duration-300 shadow-xs"
             >
               <FiCalendar />
@@ -516,7 +676,7 @@ const UserProfile = () => {
             </button>
           </div>
 
-          {user.bookings.length === 0 ? (
+          {user.bookings.length === 0 && user.consultations.length === 0 ? (
             <div className="text-center py-12">
               <div className="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                 <FiCalendar className="text-gray-400" size={32} />
@@ -528,7 +688,7 @@ const UserProfile = () => {
                 Schedule your first appointment
               </p>
               <button
-                onClick={() => navigate("/services")}
+                onClick={() => navigate("/userDashboard")}
                 className="px-6 py-3 bg-gradient-to-r text-[#F27781] border border-[#F27781] rounded-lg hover:bg-[#F27781] hover:text-white transition-all duration-300 shadow-xs"
               >
                 Book Now
@@ -545,7 +705,7 @@ const UserProfile = () => {
                   <div className="flex justify-between items-start">
                     <div>
                       <p className="text-lg font-semibold text-gray-900 capitalize">
-                        {booking.serviceType}
+                        {booking.serviceType.name}
                       </p>
                       <div className="flex items-center space-x-4 mt-2">
                         <div className="flex items-center text-sm text-gray-500">
@@ -561,10 +721,10 @@ const UserProfile = () => {
                             )}
                           </span>
                         </div>
-                        {booking.pet && (
+                        {booking.petId && (
                           <div className="flex items-center text-sm text-gray-500">
                             <span className="bg-gray-100 px-2 py-1 rounded-full">
-                              {booking.pet.name}
+                              {booking.status}
                             </span>
                           </div>
                         )}
@@ -588,13 +748,64 @@ const UserProfile = () => {
                     <div>
                       <p className="text-sm text-gray-500">Professional</p>
                       <p className="font-medium">
-                        Dr. {booking.professional?.name || "Not assigned"}
+                        Dr. {booking.serviceType?.petType || "Not assigned"}
                       </p>
                     </div>
                     <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
                       View Details
                     </button>
                   </div>
+                </motion.li>
+              ))}
+              {user.consultations.map((consultation) => (
+                <motion.li
+                  key={`consultation-${consultation._id}`}
+                  whileHover={{ scale: 1.01 }}
+                  className="border border-gray-200 rounded-xl p-5 hover:shadow-xs transition-all duration-300"
+                >
+                  <div className="flex justify-between items-start"
+                  onClick={() => {
+                    setSelectedConsultation(consultation);
+                    setShowConsultationCard(true);
+                  }}>
+                    <div>
+                      <p className="text-lg font-semibold text-gray-900 capitalize">
+                        {consultation.mode}
+                      </p>
+                      <div className="flex items-center space-x-4 mt-2">
+                        <div className="flex items-center text-sm text-gray-500">
+                          <FiCalendar className="mr-1" size={14} />
+                          <span>
+                            {new Date(consultation.appointmentDate).toLocaleDateString(
+                              "en-US",
+                              {
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              }
+                            )}
+                          </span>
+                          <span>
+                            {consultation.appointmentTime || ""}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        consultation.status === "confirmed"
+                          ? "bg-green-100 text-green-800"
+                          : consultation.status === "pending"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : consultation.status === "cancelled"
+                          ? "bg-red-100 text-red-800"
+                          : "bg-gray-100 text-gray-800"
+                      }`}
+                    >
+                      {consultation.status}
+                    </span>
+                  </div>
+                  
                 </motion.li>
               ))}
             </ul>
@@ -607,6 +818,13 @@ const UserProfile = () => {
             key={selectedPet?._id ?? "petcard"}
             pet={selectedPet}
             onClose={() => setShowPetCard(false)}
+          />
+        )}
+        {showConsultationCard && (
+          <ConsultationCard
+            key={selectedConsultation?._id ?? "consultationcard"}
+            consultation={selectedConsultation}
+            onClose={() => setShowConsultationCard(false)}
           />
         )}
       </AnimatePresence>
