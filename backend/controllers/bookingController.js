@@ -5,6 +5,7 @@ const Booking = require("../models/BookingPethouse");
 exports.createBooking = async (req, res) => {
   try {
     const userId = req.user.id;
+    console.log(req.body);
 
     const {
       petHouseId,
@@ -91,13 +92,20 @@ exports.updateBookingStatus = async (req, res) => {
     const { status } = req.body;
 
     if (role !== "pethouse") {
-      return res.status(403).json({ message: "Only PetHouses can update status" });
+      return res
+        .status(403)
+        .json({ message: "Only PetHouses can update status" });
     }
 
-    const booking = await Booking.findOne({ _id: bookingId, petHouseId: userId });
+    const booking = await Booking.findOne({
+      _id: bookingId,
+      petHouseId: userId,
+    });
 
     if (!booking) {
-      return res.status(404).json({ message: "Booking not found or not authorized" });
+      return res
+        .status(404)
+        .json({ message: "Booking not found or not authorized" });
     }
 
     booking.status = status;
@@ -106,6 +114,8 @@ exports.updateBookingStatus = async (req, res) => {
     res.status(200).json({ message: "Status updated", booking });
   } catch (err) {
     console.error("Error updating booking status:", err);
-    res.status(500).json({ message: "Server error while updating booking status" });
+    res
+      .status(500)
+      .json({ message: "Server error while updating booking status" });
   }
 };

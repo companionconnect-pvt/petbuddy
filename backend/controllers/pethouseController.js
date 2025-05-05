@@ -100,10 +100,11 @@ const updateProfile = async (req, res) => {
 
 // Get All PetHouses (Public)
 const getAllPetHouses = async (req, res) => {
-  console.log("Fetch all pet houses request initiated");
+  // console.log("Fetch all pet houses request initiated method");
 
   try {
     const petHouses = await PetHouse.find();
+    // console.log("Fetched pet houses:", petHouses);
     res.status(200).json(petHouses);
   } catch (err) {
     console.error(err);
@@ -124,6 +125,20 @@ const acceptBooking = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Failed to accept booking" });
+  }
+};
+
+const getPethouseBookings = async (req, res) => {
+  try {
+    const bookings = await Booking.find({ pethouseId: req.user.id })
+      .populate("userId", "name email") // populate user details if needed
+      .populate("petId") // optional: populate pet details
+      .sort({ createdAt: -1 }); // latest first
+
+    res.status(200).json(bookings);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch bookings" });
   }
 };
 
@@ -192,4 +207,5 @@ module.exports = {
   acceptBooking,
   cancelBooking,
   ratePetHouse,
+  getPethouseBookings,
 };

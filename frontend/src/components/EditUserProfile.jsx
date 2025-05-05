@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api";
-import { FiUser, FiMail, FiPhone, FiMapPin, FiLock, FiArrowLeft } from "react-icons/fi";
+import {
+  FiUser,
+  FiMail,
+  FiPhone,
+  FiMapPin,
+  FiLock,
+  FiArrowLeft,
+} from "react-icons/fi";
 import { motion } from "framer-motion";
 
 const EditUserProfile = () => {
@@ -94,17 +101,34 @@ const EditUserProfile = () => {
       fields: [
         { name: "name", label: "Full Name", icon: <FiUser size={16} /> },
         { name: "email", label: "Email Address", icon: <FiMail size={16} /> },
-        { name: "phoneNumber", label: "Phone Number", icon: <FiPhone size={16} /> },
-        { name: "password", label: "New Password", type: "password", icon: <FiLock size={16} /> },
+        {
+          name: "phoneNumber",
+          label: "Phone Number",
+          icon: <FiPhone size={16} />,
+        },
+        {
+          name: "password",
+          label: "New Password",
+          type: "password",
+          icon: <FiLock size={16} />,
+        },
       ],
     },
     {
       title: "Address",
       icon: <FiMapPin size={18} />,
       fields: [
-        { name: "street", label: "Street Address", icon: <FiMapPin size={16} /> },
+        {
+          name: "street",
+          label: "Street Address",
+          icon: <FiMapPin size={16} />,
+        },
         { name: "city", label: "City", icon: <FiMapPin size={16} /> },
-        { name: "state", label: "State/Province", icon: <FiMapPin size={16} /> },
+        {
+          name: "state",
+          label: "State/Province",
+          icon: <FiMapPin size={16} />,
+        },
         { name: "zip", label: "ZIP/Postal Code", icon: <FiMapPin size={16} /> },
       ],
     },
@@ -129,7 +153,9 @@ const EditUserProfile = () => {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="p-8 border-b border-gray-200">
             <h1 className="text-3xl font-bold text-gray-900">Edit Profile</h1>
-            <p className="text-gray-500 mt-2">Update your personal information</p>
+            <p className="text-gray-500 mt-2">
+              Update your personal information
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="divide-y divide-gray-200">
@@ -145,7 +171,9 @@ const EditUserProfile = () => {
                   <div className="p-2 rounded-lg bg-[#F27781] bg-opacity-10 text-[#F27781] mr-3">
                     {group.icon}
                   </div>
-                  <h2 className="text-lg font-semibold text-gray-800">{group.title}</h2>
+                  <h2 className="text-lg font-semibold text-gray-800">
+                    {group.title}
+                  </h2>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

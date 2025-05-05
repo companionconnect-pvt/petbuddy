@@ -117,3 +117,14 @@ exports.login = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+exports.fetchAllClinics = async (req, res) => {
+  try {
+    const clinics = await PetClinic.find(); // optional sorting by newest
+
+    res.status(200).json(clinics);
+  } catch (err) {
+    console.error("Fetch Clinics Error:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

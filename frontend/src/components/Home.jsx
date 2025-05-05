@@ -39,9 +39,10 @@ const Home = () => {
             Welcome to <span className="text-[#F27781]">PetBuddy</span>
           </h1>
           <p className="text-lg text-gray-600 mb-6">
-            Your one-stop solution for trusted pet care, boarding, and veterinary services.
+            Your one-stop solution for trusted pet care, boarding, and
+            veterinary services.
           </p>
-          
+
           {/* Conditionally Render Buttons */}
           {!isLoggedIn ? (
             <div>
@@ -75,7 +76,9 @@ const Home = () => {
       {/* Services Section */}
       <div className="bg-white py-16">
         <div className="max-w-6xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold text-[#222222] mb-8">Our Services</h2>
+          <h2 className="text-3xl font-bold text-[#222222] mb-8">
+            Our Services
+          </h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               { title: "Pet Boarding", icon: "🐾" },
@@ -85,9 +88,14 @@ const Home = () => {
               { title: "Chat with Caretakers", icon: "💬" },
               { title: "Vet Appointment Booking", icon: "📅" },
             ].map((service, idx) => (
-              <div key={idx} className="bg-[#FAF9F6] p-6 rounded-xl shadow hover:shadow-lg transition">
+              <div
+                key={idx}
+                className="bg-[#FAF9F6] p-6 rounded-xl shadow hover:shadow-lg transition"
+              >
                 <div className="text-5xl mb-4">{service.icon}</div>
-                <h3 className="text-xl font-semibold text-[#222222]">{service.title}</h3>
+                <h3 className="text-xl font-semibold text-[#222222]">
+                  {service.title}
+                </h3>
               </div>
             ))}
           </div>
@@ -97,12 +105,22 @@ const Home = () => {
       {/* Testimonials */}
       <div className="bg-[#FAF9F6] py-16">
         <div className="max-w-6xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold text-[#222222] mb-10">Happy Pet Parents</h2>
+          <h2 className="text-3xl font-bold text-[#222222] mb-10">
+            Happy Pet Parents
+          </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-white p-6 rounded-xl shadow-md text-left">
-                <p className="text-gray-600 italic">"PetBuddy took great care of Bruno while I was away. The video calls made me feel so connected!"</p>
-                <div className="mt-4 font-semibold text-[#222222]">— A Happy Customer</div>
+              <div
+                key={i}
+                className="bg-white p-6 rounded-xl shadow-md text-left"
+              >
+                <p className="text-gray-600 italic">
+                  "PetBuddy took great care of Bruno while I was away. The video
+                  calls made me feel so connected!"
+                </p>
+                <div className="mt-4 font-semibold text-[#222222]">
+                  — A Happy Customer
+                </div>
               </div>
             ))}
           </div>
@@ -139,7 +157,9 @@ const Home = () => {
               placeholder="Enter your email"
               className="w-full border p-2 rounded"
             />
-            <button className="bg-[#F27781] text-white px-4 py-2 mt-2 rounded">Subscribe</button>
+            <button className="bg-[#F27781] text-white px-4 py-2 mt-2 rounded">
+              Subscribe
+            </button>
           </div>
         </div>
       </footer>

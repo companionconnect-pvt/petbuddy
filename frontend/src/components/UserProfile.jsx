@@ -37,6 +37,7 @@ const UserProfile = () => {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setUser(res.data);
+      console.log("User data : ", res.data);
     } catch (err) {
       alert("Failed to fetch user data");
     } finally {

@@ -47,24 +47,24 @@ const bookingSchema = new mongoose.Schema(
 
     source: {
       address: {
-        street: { type: String, required: true },
-        city: { type: String, required: true },
-        state: { type: String, required: true },
-        zip: { type: String, required: true },
+        street: { type: String },
+        city: { type: String },
+        state: { type: String },
+        zip: { type: String },
       },
-      latitude: { type: Number, required: true },
-      longitude: { type: Number, required: true },
+      latitude: { type: Number },
+      longitude: { type: Number },
     },
 
     destination: {
       address: {
-        street: { type: String, required: true },
-        city: { type: String, required: true },
-        state: { type: String, required: true },
-        zip: { type: String, required: true },
+        street: { type: String },
+        city: { type: String },
+        state: { type: String },
+        zip: { type: String },
       },
-      latitude: { type: Number, required: true },
-      longitude: { type: Number, required: true },
+      latitude: { type: Number },
+      longitude: { type: Number },
     },
   },
   { timestamps: true }

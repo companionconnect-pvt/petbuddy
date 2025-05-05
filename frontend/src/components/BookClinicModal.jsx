@@ -1,11 +1,10 @@
-// components/BookingModal.jsx
 import React, { useEffect, useState } from "react";
 import API from "../api";
 import Modal from "react-modal";
 
 Modal.setAppElement("#root");
 
-const BookingModal = ({ isOpen, onClose, petHouse }) => {
+const ClinicModal = ({ isOpen, onClose, petHouse }) => {
   const [pets, setPets] = useState([]);
   const [selectedPetId, setSelectedPetId] = useState("");
   const [selectedService, setSelectedService] = useState(null);
@@ -170,4 +169,4 @@ const BookingModal = ({ isOpen, onClose, petHouse }) => {
   );
 };
 
-export default BookingModal;
+export default ClinicModal;
