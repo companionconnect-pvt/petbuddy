@@ -4,8 +4,9 @@ const verifyToken = require("../middlewares/auth");
 
 const router = express.Router();
 
-
 router.post("/signup", verifyToken, petController.signup);
+
+router.get("/fetchall", verifyToken, petController.getAllPets);
 
 router.delete("/:petId", verifyToken, petController.removePet);
 

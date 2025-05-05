@@ -1,22 +1,22 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+
 require("dotenv").config();
 const http = require("http");
 const { Server } = require("socket.io");
 
-// Import routes
 const clinicRoutes = require("./routes/clinicAuth");
 const petHouseAuth = require("./routes/pethouseAuth.js");
 const authRoutes = require("./routes/authRoutes.js");
 const driverRoutes = require("./routes/driverRoutes.js");
 const userRoutes = require("./routes/userRoutes");
 const petRoutes = require("./routes/petRoutes");
-const setupVideoCall = require("./socket/videoCall");  // Import video call logic
+const setupVideoCall = require("./socket/videoCall"); // Import video call logic
 const chatRoutes = require("./routes/chatRoutes.js");
-const chatBotRoutes  = require("./routes/chatbotRoutes.js");
+const chatBotRoutes = require("./routes/chatbotRoutes.js");
+const bookingRoutes = require("./routes/bookingRoutes.js");
 
-// Initialize app and server
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -26,20 +26,20 @@ const io = new Server(server, {
   },
 });
 
-// Middleware
-app.use(express.json());
-app.use(cors()); // Allow requests from all origins during development
+// Middleware setup
+app.use(cors()); // Enable all CORS requests or customize based on your needs
+app.use(express.json()); // Parse incoming JSON requests
 
-// Routes
+// Routes setup
 app.use("/api/petclinic", clinicRoutes);
-app.use("/api/auth", authRoutes);
-app.use("/api/pethouse", petHouseAuth);
+app.use("/api/auth", authRoutes); // General user authentication routes
+app.use("/api/pethouse", petHouseAuth); // Pet house specific authentication routes
 app.use("/api/driver", driverRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/pet", petRoutes);
+app.use("/api/booking", bookingRoutes);
 app.use("/api/chat", chatRoutes); // Chat route
 app.use("/api/chatbot", chatBotRoutes);
-
 // MongoDB connection
 mongoose
   .connect(process.env.MONGO_URI, {
@@ -47,12 +47,11 @@ mongoose
     useUnifiedTopology: true,
   })
   .then(() => {
-    // Start the server once MongoDB is connected
-    server.listen(5000, () => console.log("Server running on port 5000"));
+    app.listen(5000, () => console.log("Server running on port 5000"));
   })
   .catch((err) => {
-    console.error("MongoDB connection error:", err.message);
-    process.exit(1); // Exit on failure
+    console.error("Error connecting to MongoDB:", err.message);
+    process.exit(1); // Exit the process if the connection fails
   });
 
 // Chat Logic (Socket.IO)
@@ -64,8 +63,14 @@ io.on("connection", (socket) => {
   });
 
   socket.on("sendMessage", ({ ticketId, senderId, senderName, message }) => {
-    const chatMessage = { ticketId, senderId, senderName, message, timestamp: new Date() };
-    
+    const chatMessage = {
+      ticketId,
+      senderId,
+      senderName,
+      message,
+      timestamp: new Date(),
+    };
+
     // Emit message to all users in the room
     io.to(ticketId).emit("receiveMessage", chatMessage);
   });
@@ -77,4 +82,3 @@ io.on("connection", (socket) => {
 
 // Setup video call logic
 setupVideoCall(io);
-

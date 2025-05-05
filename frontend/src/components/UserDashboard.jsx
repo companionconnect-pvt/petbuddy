@@ -4,6 +4,7 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import PetHouseModal from "./PetHouseModal";
+import BookingModal from "./BookingModal";
 
 // Fix for default icon path issue in Leaflet
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
@@ -25,6 +26,7 @@ const UserDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedPetHouse, setSelectedPetHouse] = useState(null);
+  const [bookingModalOpen, setBookingModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchPethouses = async () => {
@@ -107,7 +109,14 @@ const UserDashboard = () => {
                 >
                   Know More
                 </button>
-                <button className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition">
+
+                <button
+                  className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition"
+                  onClick={() => {
+                    setSelectedPetHouse(house);
+                    setBookingModalOpen(true);
+                  }}
+                >
                   Book Now
                 </button>
               </div>
@@ -117,7 +126,7 @@ const UserDashboard = () => {
       </div>
 
       {/* Right: Map */}
-      <div className="w-full lg:w-1/2 h-[500px] lg:h-full z-index-0">
+      {/* <div className="w-full lg:w-1/2 h-[500px] lg:h-full z-index-0">
         <MapContainer
           center={[28.6139, 77.209]} // Default center (e.g., Delhi)
           zoom={10}
@@ -148,14 +157,24 @@ const UserDashboard = () => {
             return null;
           })}
         </MapContainer>
-      </div>
+      </div> */}
 
-      {/* Modal Component */}
-      {selectedPetHouse && (
+      {selectedPetHouse && modalIsOpen && (
         <PetHouseModal
           petHouse={selectedPetHouse}
           isOpen={modalIsOpen}
           onClose={closeModal}
+        />
+      )}
+
+      {selectedPetHouse && bookingModalOpen && (
+        <BookingModal
+          petHouse={selectedPetHouse}
+          isOpen={bookingModalOpen}
+          onClose={() => {
+            setBookingModalOpen(false);
+            setSelectedPetHouse(null);
+          }}
         />
       )}
     </div>
