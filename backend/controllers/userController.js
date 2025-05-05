@@ -2,7 +2,7 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Pet = require('../models/Pet'); 
-const Booking = require('../models/Booking'); 
+const Booking = require('../models/BookingPethouse'); 
 
 const JWT_SECRET = "Yg#8s9iFgT!pM2nA5w@QeZ6rLp^RtZ3k";
 

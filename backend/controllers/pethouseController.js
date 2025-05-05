@@ -1,7 +1,7 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const PetHouse = require("../models/PetHouse");
-const Booking = require("../models/Booking");
+const Booking = require("../models/BookingPethouse");
 
 // Signup
 const signup = async (req, res) => {
