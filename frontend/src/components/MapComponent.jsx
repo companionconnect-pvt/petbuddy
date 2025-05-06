@@ -2,86 +2,84 @@ import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet-routing-machine';
+import 'leaflet/dist/leaflet.css';
+import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 
-const Routing = ({ currentPosition, destinationPosition }) => {
-  const map = useMap(); // Access the map instance
-
+const ChangeMapView = ({ center }) => {
+  const map = useMap();
   useEffect(() => {
-    // Add routing control after the map is ready
-    const routeControl = L.Routing.control({
-      waypoints: [
-        L.latLng(currentPosition.lat, currentPosition.lng), // Current position
-        L.latLng(destinationPosition.lat, destinationPosition.lng), // Destination
-      ],
-      createMarker: function () {
-        return null; // Optional: disable markers at route points
-      },
-      routeWhileDragging: true, // Optional: allows real-time route updates when dragging waypoints
-      lineOptions: {
-        styles: [
-          {
-            color: '#003366', // Dark blue color (bright dark blue)
-            weight: 4, // Line thickness
-            opacity: 0.7, // Line opacity
-          },
-        ],
-      },
-    }).addTo(map);
-
-    return () => {
-      map.removeControl(routeControl); // Clean up when the component is unmounted
-    };
-  }, [currentPosition, destinationPosition, map]);
-
+    if (center) map.setView(center, map.getZoom());
+  }, [center, map]);
   return null;
 };
 
-const MapComponent = () => {
-  const [currentPosition, setCurrentPosition] = useState(null);
-  const [destinationPosition] = useState({ lat: 28.6139, lng: 77.2090 }); // Example: New Delhi (change to your destination)
+const Routing = ({ current, source, destination }) => {
+  const map = useMap();
 
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setCurrentPosition({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          });
-        },
-        (error) => {
-          console.error('Error getting location: ', error);
-        }
-      );
-    } else {
-      console.log('Geolocation is not supported by this browser.');
-    }
+    if (!current || !source || !destination) return;
+
+    const routingControl = L.Routing.control({
+      waypoints: [
+        L.latLng(current.lat, current.lng),
+        L.latLng(source.lat, source.lng),
+        L.latLng(destination.lat, destination.lng),
+      ],
+      createMarker: () => null,
+      lineOptions: {
+        styles: [{ color: '#003366', weight: 4, opacity: 0.8 }],
+      },
+      show: false,
+      addWaypoints: false,
+      routeWhileDragging: false,
+    }).addTo(map);
+
+    return () => {
+      map.removeControl(routingControl);
+    };
+  }, [current, source, destination, map]);
+
+  return null;
+};
+const MapComponent = ({ activeTrip }) => {
+  const [currentPosition, setCurrentPosition] = useState(null);
+
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setCurrentPosition({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+      },
+      (error) => {
+        console.error('Error getting location: ', error);
+      }
+    );
   }, []);
 
-  if (!currentPosition) {
-    return <div>Loading...</div>;
-  }
+  const sourceCoordinates = activeTrip?.sourceCoordinates;
+  const destCoordinates = activeTrip?.destCoordinates;
+
+  if (!currentPosition) return <div>Loading map...</div>;
 
   return (
-    <MapContainer
-      center={currentPosition}
-      zoom={15}
-      style={{ height: '400px', width: '100%' }}
-    >
+    <MapContainer center={currentPosition} zoom={13} style={{ height: '400px', width: '100%' }}>
+      <ChangeMapView center={currentPosition} />
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attribution="&copy; OpenStreetMap contributors"
       />
-      <Marker position={currentPosition}>
-        <Popup>You are here!</Popup>
-      </Marker>
-      <Marker position={destinationPosition}>
-        <Popup>Destination</Popup>
-      </Marker>
-      {/* Add Routing Component */}
-      <Routing currentPosition={currentPosition} destinationPosition={destinationPosition} />
+
+      <Marker position={currentPosition}><Popup>You are here!</Popup></Marker>
+      {sourceCoordinates && <Marker position={sourceCoordinates}><Popup>Pickup</Popup></Marker>}
+      {destCoordinates && <Marker position={destCoordinates}><Popup>Drop-off</Popup></Marker>}
+
+      {sourceCoordinates && destCoordinates && currentPosition && (
+        <Routing current={currentPosition} source={sourceCoordinates} destination={destCoordinates} />
+      )}
     </MapContainer>
   );
 };
 
-export default MapComponent;
+export default MapComponent; 
