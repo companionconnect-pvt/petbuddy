@@ -18,6 +18,7 @@ import DriverProfile from "./components/DriverProfile";
 import PethouseLogin from "./components/Pethouse/PethouseLogin";
 import PethouseSignup from "./components/Pethouse/PethouseSignup";
 import PethouseDashboard from "./components/Pethouse/PethouseDashboard";
+import PethouseProfile from "./components/Pethouse/PethouseProfile";
 
 import PetClinicDashboard from "./components/PetClinic/PetClinicDashboard";
 import PetClinicLogin from "./components/PetClinic/PetClinicLogin";
@@ -35,13 +36,14 @@ function App() {
         <Route path="/driver-profile" element={<DriverProfile />} />
 
         {/* PetHouse Routes */}
-        <Route path="/pethouse/signup" element={<PethouseSignup />} />
+        <Route path="pethouse/signup" element={<PethouseSignup />} />
         <Route path="pethouse/login" element={<PethouseLogin />} />
         <Route path="pethouse/dashboard" element={<PethouseDashboard />} />
-        
+        <Route path="pethouse/profile" element={<PethouseProfile />} />
+
         {/* PetClinic Routes */}
-        <Route path="/petclinic/dashboard" element = {<PetClinicDashboard/>}/> 
-        <Route path="/petclinic/login" element = {<PetClinicLogin/>}/>
+        <Route path="/petclinic/dashboard" element={<PetClinicDashboard />} />
+        <Route path="/petclinic/login" element={<PetClinicLogin />} />
 
         {/* Routes with Navbar inside Layout */}
         <Route element={<Layout />}>

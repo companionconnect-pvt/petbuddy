@@ -47,6 +47,9 @@ const signup = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log(req.body);
+    const hashedPassword = await bcrypt.hash(password, 10);
+    console.log("Hashed password:", hashedPassword);
 
     const petHouse = await PetHouse.findOne({ email });
     if (!petHouse)
@@ -73,6 +76,8 @@ const login = async (req, res) => {
 
 // Get PetHouse Profile
 const getPetHouseProfile = async (req, res) => {
+  console.log("Get PetHouse Profile request initiated");
+  console.log("User ID:", req.user.id);
   try {
     const petHouse = await PetHouse.findById(req.user.id);
     if (!petHouse)
@@ -114,13 +119,16 @@ const getAllPetHouses = async (req, res) => {
 
 // Accept Booking
 const acceptBooking = async (req, res) => {
+  console.log("Accept booking request initiated", req.params.id, req.user.id);
   try {
     const booking = await Booking.findById(req.params.id);
-    if (!booking || booking.pethouseId.toString() !== req.user.id)
+
+    if (!booking || booking.petHouseId.toString() !== req.user.id)
       return res.status(404).json({ message: "Booking not found" });
 
-    booking.status = "accepted";
+    booking.status = "confirmed";
     await booking.save();
+
     res.status(200).json({ message: "Booking accepted" });
   } catch (err) {
     console.error(err);
@@ -144,13 +152,21 @@ const getPethouseBookings = async (req, res) => {
 
 // Cancel Booking
 const cancelBooking = async (req, res) => {
+  console.log("Cancel booking request initiated", req.params.id, req.user.id);
   try {
     const booking = await Booking.findById(req.params.id);
-    if (!booking || booking.pethouseId.toString() !== req.user.id)
+
+    if (
+      !booking ||
+      !booking.petHouseId ||
+      booking.petHouseId.toString() !== req.user.id
+    )
       return res.status(404).json({ message: "Booking not found" });
 
+    console.log("Booking found:", booking);
     booking.status = "cancelled";
     await booking.save();
+
     res.status(200).json({ message: "Booking cancelled" });
   } catch (err) {
     console.error(err);

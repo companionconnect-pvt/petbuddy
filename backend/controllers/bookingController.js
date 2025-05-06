@@ -33,7 +33,7 @@ exports.createBooking = async (req, res) => {
 
     await newBooking.save();
     const updateUserBookings = await User.findbyIdAndUpdate(userId, {
-      $push: { bookings : newBooking._id }
+      $push: { bookings: newBooking._id },
     });
     res
       .status(201)

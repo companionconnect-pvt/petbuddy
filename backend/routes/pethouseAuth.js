@@ -18,11 +18,11 @@ router.post("/login", login);
 
 // Protected Routes
 
+router.patch("/booking/:id/accept", verifyToken, acceptBooking);
+router.patch("/booking/:id/cancel", verifyToken, cancelBooking);
 router.get("/all", verifyToken, getAllPetHouses);
 router.get("/profile", verifyToken, getPetHouseProfile);
 router.patch("/update", verifyToken, updateProfile);
 router.get("/", getAllPetHouses);
-router.patch("/booking/:id/accept", verifyToken, acceptBooking);
-router.patch("/booking/:id/cancel", verifyToken, cancelBooking);
 
 module.exports = router;

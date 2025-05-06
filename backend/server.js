@@ -16,7 +16,7 @@ const setupVideoCall = require("./socket/videoCall"); // Import video call logic
 const chatRoutes = require("./routes/chatRoutes.js");
 const chatBotRoutes = require("./routes/chatbotRoutes.js");
 const bookingRoutes = require("./routes/bookingRoutes.js");
-const consultationRoutes = require("./routes/consultationRoutes.js"); 
+const consultationRoutes = require("./routes/consultationRoutes.js");
 
 const app = express();
 const server = http.createServer(app);
@@ -49,7 +49,7 @@ mongoose
     useUnifiedTopology: true,
   })
   .then(() => {
-    app.listen(5000, () => console.log("Server running on port 5000"));
+    server.listen(5000, () => console.log("Server running on port 5000"));
   })
   .catch((err) => {
     console.error("Error connecting to MongoDB:", err.message);
