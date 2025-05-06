@@ -27,6 +27,7 @@ exports.signup = async (req, res) => {
       address,
       pets: [],
       bookings: [],
+      consultations: [],
       paymentMethods,
     });
     console.log(user);

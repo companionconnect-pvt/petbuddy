@@ -14,4 +14,6 @@ router.get("/:petId", verifyToken, petController.getPet);
 
 router.put("/:petId", verifyToken, petController.updatePet);
 
+router.put("/medicalHistory/:petId", verifyToken, petController.updateMedicalHistory);
+
 module.exports = router; // Use module.exports instead of export default

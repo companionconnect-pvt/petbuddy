@@ -107,3 +107,28 @@ exports.updatePet = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+exports.updateMedicalHistory = async(req, res) => {
+  try {
+    const petId = req.params.petId;
+    console.log(req.body);
+    const { date, description, doctor, treatment, notes } = req.body;
+    const newMedicalHistory = {
+      date: date,
+      description: description,
+      doctor: doctor,
+      treatment: treatment,
+      notes: notes,
+    };
+
+    const updatedMedicalHistory = await Pet.findByIdAndUpdate(petId, {
+      $push : {medicalHistory : newMedicalHistory},
+    });
+
+    return res.status(200).json({ medicalHistory: newMedicalHistory });
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server error" });
+  }
+};

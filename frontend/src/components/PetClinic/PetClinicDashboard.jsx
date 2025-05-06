@@ -27,6 +27,12 @@ const PetClinicDashboard = () => {
     dateRange: "all",
   });
   const [showFilters, setShowFilters] = useState(false);
+  const [completionDetails, setCompletionDetails] = useState({
+    description: "",
+    treatment: "",
+    notes: "",
+  });
+  const [showCompletionForm, setShowCompletionForm] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -35,17 +41,15 @@ const PetClinicDashboard = () => {
 
   const fetchConsultations = async () => {
     try {
-
-         const token = localStorage.getItem("token");
-         if (!token) {
-            navigate("/petclinic/login");
-            return;
-         }   
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/petclinic/login");
+        return;
+      }
 
       const res = await API.get("/consultation/clinic", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log(res.data);
       setConsultations(res.data);
     } catch (err) {
       console.error("Failed to fetch consultations", err);
@@ -57,20 +61,16 @@ const PetClinicDashboard = () => {
 
   const filteredConsultations = consultations
     .filter((consultation) => {
-      // Search filter
       const matchesSearch =
         consultation.petId?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         consultation.userId?.name?.toLowerCase().includes(searchTerm.toLowerCase());
 
-      // Status filter
       const matchesStatus =
         filters.status === "all" || consultation.status === filters.status;
 
-      // Mode filter
       const matchesMode =
         filters.mode === "all" || consultation.mode === filters.mode;
 
-      // Date filter
       const now = new Date();
       const consultationDate = new Date(consultation.appointmentDate);
       let matchesDate = true;
@@ -111,21 +111,198 @@ const PetClinicDashboard = () => {
     { value: "past", label: "Past" },
   ];
 
-  const updateConsultationStatus = async (id, newStatus) => {
+  const petMedicalHistoryUpdate = async (petId, medicalHistoryData) => {
     try {
-      await API.put(
-        `/consultation/${id}/status`,
-        { status: newStatus },
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/petclinic/login");
+        return;
+      }
+      const res = await API.put(
+        `/pet/medicalHistory/${petId}`,
+        medicalHistoryData,
         {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
+      return res.data;
+    } catch (error) {
+      console.error("Failed to update Pet Medical History: ", error);
+      throw error; // Re-throw to handle in the calling function
+    }
+  };
+
+  const updateConsultationStatus = async (consultation, newStatus, details = null) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/petclinic/login");
+        return;
+      }
+  
+      const payload = { status: newStatus };
+      const id = consultation._id;
+      
+      if (newStatus === "completed" && details) {
+        payload.description = details.description; // Make sure this matches your backend expectation
+        payload.treatment = details.treatment;
+        payload.notes = details.notes;
+      }
+  
+      // First update the consultation status
+      await API.put(
+        `/consultation/${id}/status`,
+        payload,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+  
+      // If completing, also update pet medical history
+      if (newStatus === "completed" && details) {
+        const medicalHistoryData = {
+          date: new Date().toISOString(), // Fixed from .now to .toISOString()
+          description: details.description,
+          doctor: consultation.petClinicId?.name || "Clinic Doctor", // Added fallback
+          treatment: details.treatment,
+          notes: details.notes,
+        };
+  
+        await petMedicalHistoryUpdate(
+          consultation.petId._id, // Use the consultation parameter directly
+          medicalHistoryData
+        );
+      }
+  
+      // Refresh consultations and reset state
       fetchConsultations();
       setShowDetail(false);
+      setShowCompletionForm(false);
+      setCompletionDetails({
+        description: "",
+        treatment: "",
+        notes: "",
+      });
+      
     } catch (err) {
       console.error("Failed to update status", err);
-      alert("Failed to update consultation status");
+      alert(`Failed to update consultation status: ${err.response?.data?.message || err.message}`);
     }
+  };
+
+  const CompletionFormModal = ({ 
+    consultation, 
+    onClose, 
+    onSubmit, 
+  }) => {
+    const [details, setDetails] = useState({
+      description: "",
+      treatment: "",
+      notes: "",
+    });
+    const handleSubmit = () => {
+      onSubmit(consultation, "completed", details);
+      onClose();
+    };
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+        onClick={onClose}
+      >
+        <motion.div
+          initial={{ scale: 0.95 }}
+          animate={{ scale: 1 }}
+          className="bg-white rounded-2xl w-full max-w-2xl"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="p-6">
+            <div className="flex justify-between items-start mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Complete Consultation
+                </h2>
+                <p className="text-gray-600">
+                  Please enter the consultation details to mark as completed
+                </p>
+              </div>
+              <button
+                onClick={onClose}
+                className="text-gray-500 hover:text-gray-700 p-1"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Diagnosis
+                </label>
+                <input
+                  type="text"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  value={details.description}
+                  onChange={(e) =>
+                    setDetails({ ...details, description: e.target.value })
+                  }
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Treatment Provided
+                </label>
+                <textarea
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  rows={3}
+                  value={details.treatment}
+                  onChange={(e) =>
+                    setDetails({ ...details, treatment: e.target.value })
+                  }
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Additional Notes
+                </label>
+                <textarea
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  rows={2}
+                  value={details.notes}
+                  onChange={(e) =>
+                    setDetails({ ...details, notes: e.target.value })
+                  }
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
+              <button
+                onClick={onClose}
+                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {onSubmit(consultation, "completed", details);
+                  
+                }}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                disabled={!details.description || !details.treatment}
+              >
+                Submit & Complete
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+    );
   };
 
   const ConsultationDetailCard = ({ consultation, onClose }) => {
@@ -174,7 +351,6 @@ const PetClinicDashboard = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-              {/* Pet Information */}
               <div className="bg-gray-50 p-4 rounded-lg">
                 <h3 className="font-semibold text-lg mb-3 flex items-center">
                   <FiUser className="mr-2 text-blue-500" />
@@ -208,7 +384,6 @@ const PetClinicDashboard = () => {
                 </div>
               </div>
 
-              {/* Owner Information */}
               <div className="bg-gray-50 p-4 rounded-lg">
                 <h3 className="font-semibold text-lg mb-3 flex items-center">
                   <FiUser className="mr-2 text-green-500" />
@@ -236,7 +411,6 @@ const PetClinicDashboard = () => {
                 </div>
               </div>
 
-              {/* Consultation Details */}
               <div className="bg-gray-50 p-4 rounded-lg">
                 <h3 className="font-semibold text-lg mb-3 flex items-center">
                   <FiCalendar className="mr-2 text-purple-500" />
@@ -276,7 +450,6 @@ const PetClinicDashboard = () => {
                 </div>
               </div>
 
-              {/* Payment Information */}
               <div className="bg-gray-50 p-4 rounded-lg">
                 <h3 className="font-semibold text-lg mb-3 flex items-center">
                   <RiShieldUserLine className="mr-2 text-amber-500" />
@@ -307,7 +480,6 @@ const PetClinicDashboard = () => {
               </div>
             </div>
 
-            {/* Notes */}
             {consultation.notes && (
               <div className="mb-6">
                 <h3 className="font-semibold text-lg mb-2">Notes</h3>
@@ -316,14 +488,56 @@ const PetClinicDashboard = () => {
                 </div>
               </div>
             )}
+            {consultation.petId.medicalHistory.map((medical, index) => (
+              <div className="mb-6">
+                <h3 className="font-semibold text-lg mb-2">Medical History</h3>
+                  <div key={index} className="bg-gray-50 p-4 rounded-lg">
+                    <div className="grid grid-cols-2 gap-2 mb-2">
+                      <div>
+                        <p className="text-xs text-gray-500">Date</p>
+                        <p className="text-sm font-medium">
+                          {new Date(medical.date).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                          })}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">Clinic</p>
+                        <p className="text-sm font-medium capitalize">
+                          {medical.doctor || 'Not specified'}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mb-2">
+                      <p className="text-xs text-gray-500">Description</p>
+                      <p className="text-sm font-medium">
+                        {medical.description || 'No description'}
+                      </p>
+                    </div>
+                    {medical.treatment && (
+                      <div className="mb-2">
+                        <p className="text-xs text-gray-500">Treatment</p>
+                        <p className="text-sm font-medium">{medical.treatment}</p>
+                      </div>
+                    )}
+                    {medical.notes && (
+                      <div>
+                        <p className="text-xs text-gray-500">Notes</p>
+                        <p className="text-sm font-medium">{medical.notes}</p>
+                      </div>
+                    )}
+                  </div>
+                  </div>
+                ))}
 
-            {/* Actions */}
             <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-200">
               {consultation.status === "pending" && (
                 <>
                   <button
                     onClick={() =>
-                      updateConsultationStatus(consultation._id, "confirmed")
+                      updateConsultationStatus(consultation, "confirmed")
                     }
                     className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                   >
@@ -331,7 +545,7 @@ const PetClinicDashboard = () => {
                   </button>
                   <button
                     onClick={() =>
-                      updateConsultationStatus(consultation._id, "cancelled")
+                      updateConsultationStatus(consultation, "cancelled")
                     }
                     className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                   >
@@ -342,16 +556,21 @@ const PetClinicDashboard = () => {
               {consultation.status === "confirmed" && (
                 <>
                   <button
-                    onClick={() =>
-                      updateConsultationStatus(consultation._id, "completed")
-                    }
+                    onClick={() => {
+                      setCompletionDetails({
+                        description: "",
+                        treatment: "",
+                        notes: "",
+                      });
+                      setShowCompletionForm(true);
+                    }}
                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                   >
                     Mark as Completed
                   </button>
                   <button
                     onClick={() =>
-                      updateConsultationStatus(consultation._id, "cancelled")
+                      updateConsultationStatus(consultation, "cancelled")
                     }
                     className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                   >
@@ -359,9 +578,9 @@ const PetClinicDashboard = () => {
                   </button>
                 </>
               )}
+              
               <button
                 onClick={() => {
-                  // Implement reschedule functionality
                   alert("Reschedule functionality would go here");
                 }}
                 className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
@@ -385,7 +604,6 @@ const PetClinicDashboard = () => {
           </p>
         </div>
 
-        {/* Search and Filter Bar */}
         <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="relative flex-1">
@@ -414,7 +632,6 @@ const PetClinicDashboard = () => {
             </button>
           </div>
 
-          {/* Expanded Filters */}
           <AnimatePresence>
             {showFilters && (
               <motion.div
@@ -484,7 +701,6 @@ const PetClinicDashboard = () => {
           </AnimatePresence>
         </div>
 
-        {/* Consultations List */}
         {loading ? (
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -602,13 +818,22 @@ const PetClinicDashboard = () => {
         )}
       </div>
 
-      {/* Consultation Detail Modal */}
       <AnimatePresence>
         {showDetail && selectedConsultation && (
           <ConsultationDetailCard
             consultation={selectedConsultation}
             onClose={() => setShowDetail(false)}
           />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showCompletionForm && selectedConsultation && (
+          <CompletionFormModal
+          consultation={selectedConsultation}
+          onClose={() => setShowCompletionForm(false)}
+          onSubmit={updateConsultationStatus}
+        />
         )}
       </AnimatePresence>
     </div>

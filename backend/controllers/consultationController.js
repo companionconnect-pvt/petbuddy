@@ -40,7 +40,8 @@ const getClinicConsultations = async (req, res) => {
     try {
       const consultations = await Consultation.find({ petClinicId: req.user.id })
         .populate('userId', 'name email phoneNumber')
-        .populate('petId', 'name species breed age')
+        .populate('petId', 'name species breed age medicalHistory')
+        .populate('petClinicId', 'name')
         .sort({ appointmentDate: 1 });
   
       res.status(200).json(consultations);

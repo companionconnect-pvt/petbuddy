@@ -20,7 +20,8 @@ const petSchema = new mongoose.Schema(
         date: { type: Date, required: true },
         description: { type: String, required: true },
         doctor: { type: String, required: true }, // e.g., the vet's name or clinic
-        treatment: { type: String } // Optional, details of the treatment
+        treatment: { type: String }, // Optional, details of the treatment
+        notes: { type: String },
       }
     ]
   },

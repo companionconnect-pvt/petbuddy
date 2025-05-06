@@ -26,11 +26,26 @@ const UserProfile = () => {
   const [chatPet, setChatPet] = useState(null);
   const [selectedConsultation, setSelectedConsultation] = useState(null);
   const [showConsultationCard, setShowConsultationCard] = useState(false);
+  const [petClinics, setPetClinics] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchProfile();
+    fetchPetClinics();
   }, []);
+
+  const fetchPetClinics = async() => {
+    setIsLoading(true);
+    try {
+      const res = await API.get("/petclinic/");
+      setPetClinics(res.data);
+      console.log(res.data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   const fetchProfile = async () => {
     setIsLoading(true);
@@ -107,7 +122,7 @@ const UserProfile = () => {
         <motion.div
           initial={{ scale: 0.9 }}
           animate={{ scale: 1 }}
-          className="bg-white rounded-2xl p-8 w-full max-w-md mx-4"
+          className="bg-white rounded-2xl p-8 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex justify-between items-start mb-6">
@@ -119,7 +134,7 @@ const UserProfile = () => {
               ✕
             </button>
           </div>
-
+  
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div>
               <p className="text-sm text-gray-500">Species</p>
@@ -141,23 +156,59 @@ const UserProfile = () => {
               <p className="text-sm text-gray-500">Gender</p>
               <p className="font-medium capitalize">{pet.gender}</p>
             </div>
-            <div>
-              <p className="text-sm text-gray-500">Medical History</p>
-              <p className="font-medium capitalize">
-                Date: {pet.medicalHistory.date}
-              </p>
-              <p className="font-medium capitalize">
-                Description: {pet.medicalHistory.decription}
-              </p>
-              <p className="font-medium capitalize">
-                Doctor: {pet.medicalHistory.doctor}
-              </p>
-              <p className="font-medium capitalize">
-                Treatment: {pet.medicalHistory.treatment}
-              </p>
-            </div>
           </div>
-
+  
+          {/* Medical History Section */}
+          <div className="mb-6">
+            <h4 className="text-lg font-semibold text-gray-800 mb-3">Medical History</h4>
+            {pet.medicalHistory && pet.medicalHistory.length > 0 ? (
+              <div className="space-y-4">
+                {pet.medicalHistory.map((medical, index) => (
+                  <div key={index} className="bg-gray-50 p-4 rounded-lg">
+                    <div className="grid grid-cols-2 gap-2 mb-2">
+                      <div>
+                        <p className="text-xs text-gray-500">Date</p>
+                        <p className="text-sm font-medium">
+                          {new Date(medical.date).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                          })}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">Clinic</p>
+                        <p className="text-sm font-medium capitalize">
+                          {medical.doctor || 'Not specified'}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mb-2">
+                      <p className="text-xs text-gray-500">Description</p>
+                      <p className="text-sm font-medium">
+                        {medical.description || 'No description'}
+                      </p>
+                    </div>
+                    {medical.treatment && (
+                      <div className="mb-2">
+                        <p className="text-xs text-gray-500">Treatment</p>
+                        <p className="text-sm font-medium">{medical.treatment}</p>
+                      </div>
+                    )}
+                    {medical.notes && (
+                      <div>
+                        <p className="text-xs text-gray-500">Notes</p>
+                        <p className="text-sm font-medium">{medical.notes}</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500 text-sm">No medical history recorded</p>
+            )}
+          </div>
+  
           <div className="flex space-x-3">
             <button
               onClick={() => handleChatClick(pet)}
@@ -189,6 +240,7 @@ const UserProfile = () => {
   const ConsultationCard = ({ consultation, onClose }) => {
     // Find the pet associated with this consultation
     const pet = user.pets.find(p => p._id === consultation.petId);
+    const petClinic = petClinics.find(p => p._id === consultation.petClinicId);
   
     return (
       <motion.div
@@ -207,12 +259,17 @@ const UserProfile = () => {
           <div className="flex justify-between items-start mb-6">
             <div>
               <h3 className="text-2xl font-bold text-gray-900">
-                {consultation.mode} Consultation
+                {petClinic.name}
               </h3>
               {pet && (
+                <>
                 <p className="text-gray-600">
                   For {pet.name} ({pet.breed})
                 </p>
+                <p className="text-gray-600">
+                {consultation.mode.toUpperCase()} Consultation
+              </p>
+              </>
               )}
             </div>
             <button
@@ -258,19 +315,19 @@ const UserProfile = () => {
               </div>
             </div>
   
-            {consultation.mode === "in-person" && (
+            {consultation.mode === "In-Person" && (
               <div className="flex items-start">
                 <div className="p-2 rounded-lg bg-green-50 text-green-600 mr-3">
                   <FiMapPin size={18} />
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Location</p>
-                  <p className="font-medium">
-                    {consultation.petClinicId?.name || 'Clinic name not available'}
-                  </p>
-                  {consultation.petClinicId?.clinicAddress && (
-                    <p className="text-gray-600 text-sm">
-                      {consultation.petClinicId.clinicAddress.street}, {consultation.petClinicId.clinicAddress.city}
+                  {/* <p className="font-medium">
+                    {petClinic.name || 'Clinic name not available'}
+                  </p> */}
+                  {consultation.petClinicId && (
+                    <p className="text-gray-600 text-base font-medium">
+                      {petClinic.address.street}, {petClinic.address.city}, {petClinic.address.state}
                     </p>
                   )}
                 </div>
@@ -325,6 +382,28 @@ const UserProfile = () => {
               >
                 Cancel Appointment
               </button>
+            )}
+            {consultation.status === 'confirmed' && (
+              <>
+              <button
+                onClick={() => {
+                  // Add cancel functionality here
+                  alert('Cancel functionality would go here');
+                }}
+                className="flex-1 px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors duration-200"
+              >
+                Cancel Appointment
+              </button>
+              <button
+                onClick={() => {
+                  // Add cancel functionality here
+                  alert('Video Call Functionality');
+                }}
+                className="flex-1 px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors duration-200"
+              >
+                Video Call
+              </button>
+              </>
             )}
             <button
               onClick={() => {
@@ -704,7 +783,7 @@ const UserProfile = () => {
                 >
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="text-lg font-semibold text-gray-900 capitalize">
+                      <p className={`text-lg font-semibold text-gray-900 capitalize`}>
                         {booking.serviceType.name}
                       </p>
                       <div className="flex items-center space-x-4 mt-2">
@@ -757,7 +836,10 @@ const UserProfile = () => {
                   </div>
                 </motion.li>
               ))}
-              {user.consultations.map((consultation) => (
+              {user.consultations.map((consultation) => {
+                const petName = user.pets.find(p =>p._id === consultation.petId);
+                const clinicName = petClinics.find(p => p._id === consultation.petClinicId);
+                return (
                 <motion.li
                   key={`consultation-${consultation._id}`}
                   whileHover={{ scale: 1.01 }}
@@ -769,8 +851,8 @@ const UserProfile = () => {
                     setShowConsultationCard(true);
                   }}>
                     <div>
-                      <p className="text-lg font-semibold text-gray-900 capitalize">
-                        {consultation.mode}
+                      <p className={`text-lg font-semibold text-gray-900 capitalize`}>
+                        {petName.name} - {clinicName.name}
                       </p>
                       <div className="flex items-center space-x-4 mt-2">
                         <div className="flex items-center text-sm text-gray-500">
@@ -783,9 +865,9 @@ const UserProfile = () => {
                                 day: "numeric",
                                 year: "numeric",
                               }
-                            )}
+                            )} 
                           </span>
-                          <span>
+                          <span className= "ml-1.5">
                             {consultation.appointmentTime || ""}
                           </span>
                         </div>
@@ -807,7 +889,7 @@ const UserProfile = () => {
                   </div>
                   
                 </motion.li>
-              ))}
+              )})}
             </ul>
           )}
         </motion.div>

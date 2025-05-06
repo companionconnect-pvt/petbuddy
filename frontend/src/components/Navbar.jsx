@@ -31,7 +31,7 @@ const Navbar = () => {
         {/* Desktop Menu */}
         <nav className="hidden md:flex space-x-8 text-[#222222] font-medium">
           <Link to="/about" className="hover:text-[#F27781] transition">About</Link>
-          <Link to="/services" className="hover:text-[#F27781] transition">Services</Link>
+          <Link to="/userDashboard" className="hover:text-[#F27781] transition">Services</Link>
           <Link to="/contact" className="hover:text-[#F27781] transition">Contact</Link>
         </nav>
 
@@ -83,7 +83,7 @@ const Navbar = () => {
       {menuOpen && (
         <div className="md:hidden bg-white px-6 pb-4 space-y-3 text-[#222222]">
           <Link to="/about" onClick={() => setMenuOpen(false)} className="block hover:text-[#F27781]">About</Link>
-          <Link to="/services" onClick={() => setMenuOpen(false)} className="block hover:text-[#F27781]">Services</Link>
+          <Link to="/userDashboard" onClick={() => setMenuOpen(false)} className="block hover:text-[#F27781]">Services</Link>
           <Link to="/contact" onClick={() => setMenuOpen(false)} className="block hover:text-[#F27781]">Contact</Link>
           <hr />
           {isLoggedIn ? (
