@@ -15,6 +15,8 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const ClinicBookingModal = ({ petClinic, isOpen, onClose }) => {
+
+  
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState("");
   const [selectedPet, setSelectedPet] = useState("");

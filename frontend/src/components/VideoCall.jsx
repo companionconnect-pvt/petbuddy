@@ -1,10 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 import { Mic, MicOff, Video, VideoOff, PhoneOff } from "lucide-react";
+import { useParams } from "react-router-dom";
+
+
 
 const socket = io("http://localhost:5000");
 
-export default function VideoCall({ roomId }) {
+export default function VideoCall() {
+  const { roomId } = useParams();
   const localMainRef = useRef(null);
   const localThumbRef = useRef(null);
   const remoteRef = useRef(null);

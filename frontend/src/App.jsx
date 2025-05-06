@@ -10,6 +10,7 @@ import UserDashboard from "./components/UserDashboard";
 import Layout from "./components/Layout"; // Layout with Navbar
 import Home from "./components/Home"; // Homepage
 import VideoCallRoom from "./components/VideoCallRoom"; // update path as neededX
+import VideoCall from "./components/VideoCall";
 import Chat from "./components/Chat";
 import DriverLogin from "./components/DriverLogin";
 import DriverDashboard from "./components/DriverDashboard";
@@ -54,7 +55,7 @@ function App() {
           <Route path="/edituserprofile" element={<EditUserProfile />} />
           <Route path="/editpet/:petId" element={<EditPet />} />
           <Route path="/userDashboard" element={<UserDashboard />} />
-          <Route path="/video-call" element={<VideoCallRoom />} />
+          <Route path="/video-call/:roomId" element={<VideoCall />} />
           <Route path="/chat/:ticketId" element={<Chat />} />
         </Route>
 

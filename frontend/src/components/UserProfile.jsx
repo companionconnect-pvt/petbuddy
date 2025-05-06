@@ -22,12 +22,20 @@ const UserProfile = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPet, setSelectedPet] = useState(null);
   const [showPetCard, setShowPetCard] = useState(false);
+  const [bookingID, setbookingID] =useState("");
   const [showChatbot, setShowChatbot] = useState(false);
   const [chatPet, setChatPet] = useState(null);
   const [selectedConsultation, setSelectedConsultation] = useState(null);
   const [showConsultationCard, setShowConsultationCard] = useState(false);
   const [petClinics, setPetClinics] = useState(null);
   const navigate = useNavigate();
+
+  const handleButtonClick = () => { // replace with the actual room ID
+    navigate(`/video-call/${bookingID}`);
+  };
+  const handleButtonClickChat = () => { // replace with the actual room ID
+    navigate(`/chat/${bookingID}`);
+  };
 
   useEffect(() => {
     fetchProfile();
@@ -397,11 +405,20 @@ const UserProfile = () => {
               <button
                 onClick={() => {
                   // Add cancel functionality here
-                  alert('Video Call Functionality');
+                  handleButtonClick();
                 }}
                 className="flex-1 px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors duration-200"
               >
                 Video Call
+              </button>
+              <button
+                onClick={() => {
+                  // Add cancel functionality here
+                  handleButtonClickChat();
+                }}
+                className="flex-1 px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors duration-200"
+              >
+                Chat
               </button>
               </>
             )}
@@ -848,6 +865,7 @@ const UserProfile = () => {
                   <div className="flex justify-between items-start"
                   onClick={() => {
                     setSelectedConsultation(consultation);
+                    setbookingID(consultation._id);
                     setShowConsultationCard(true);
                   }}>
                     <div>

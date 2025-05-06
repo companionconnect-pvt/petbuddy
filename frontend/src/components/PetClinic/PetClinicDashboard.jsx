@@ -21,6 +21,7 @@ const PetClinicDashboard = () => {
   const [selectedConsultation, setSelectedConsultation] = useState(null);
   const [showDetail, setShowDetail] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [bookingID, setBookingID] = useState("");
   const [filters, setFilters] = useState({
     status: "all",
     mode: "all",
@@ -32,6 +33,14 @@ const PetClinicDashboard = () => {
     treatment: "",
     notes: "",
   });
+  const handleButtonClick = () => {
+     // replace with the actual room ID
+    navigate(`/video-call/${bookingID}`);
+  };
+  const handleButtonClickChat = () => {
+    // replace with the actual room ID
+   navigate(`/chat/${bookingID}`);
+ };
   const [showCompletionForm, setShowCompletionForm] = useState(false);
   const navigate = useNavigate();
 
@@ -545,6 +554,22 @@ const PetClinicDashboard = () => {
                   </button>
                   <button
                     onClick={() =>
+                      handleButtonClick()
+                    }
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  >
+                    VideoCall
+                  </button>
+                  <button
+                    onClick={() =>
+                      handleButtonClickChat()
+                    }
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  >
+                    Chat
+                  </button>
+                  <button
+                    onClick={() =>
                       updateConsultationStatus(consultation, "cancelled")
                     }
                     className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
@@ -567,6 +592,22 @@ const PetClinicDashboard = () => {
                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                   >
                     Mark as Completed
+                  </button>
+                  <button
+                    onClick={() =>
+                      handleButtonClick()
+                    }
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  >
+                    VideoCall
+                  </button>
+                  <button
+                    onClick={() =>
+                      handleButtonClickChat()
+                    }
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  >
+                    Chat
                   </button>
                   <button
                     onClick={() =>
@@ -742,6 +783,7 @@ const PetClinicDashboard = () => {
                 onClick={() => {
                   setSelectedConsultation(consultation);
                   setShowDetail(true);
+                  setBookingID(consultation._id);
                 }}
               >
                 <div className="p-5">
@@ -833,6 +875,7 @@ const PetClinicDashboard = () => {
           consultation={selectedConsultation}
           onClose={() => setShowCompletionForm(false)}
           onSubmit={updateConsultationStatus}
+          
         />
         )}
       </AnimatePresence>
