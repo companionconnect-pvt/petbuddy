@@ -23,7 +23,7 @@ const Home = () => {
   };
 
   const handleSignup = () => {
-    navigate("/signup");
+    navigate("/userDashboard");
   };
 
   const handleProfile = () => {
@@ -46,17 +46,17 @@ const Home = () => {
           {/* Conditionally Render Buttons */}
           {!isLoggedIn ? (
             <div>
-              <button
+              {/* <button
                 onClick={handleLogin}
                 className="bg-[#F27781] hover:bg-[#e76872] text-white px-6 py-3 rounded-lg text-lg transition mr-4"
               >
                 Login
-              </button>
+              </button> */}
               <button
                 onClick={handleSignup}
                 className="bg-[#F27781] hover:bg-[#e76872] text-white px-6 py-3 rounded-lg text-lg transition"
               >
-                Sign Up
+                Book Services
               </button>
             </div>
           ) : (
