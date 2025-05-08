@@ -184,4 +184,20 @@ const getClinicConsultations = async (req, res) => {
     }
   };
   
-module.exports = { createConsultation, getClinicConsultations, updateConsultationStatus, getConsultationStats, getConfirmedBookingsWithoutDriver};
+
+const deleteConsultation = async(req, res) => {
+  try {
+    const consultationId = req.params.id;
+    const consultation = await Consultation.findById(consultationId);
+
+    if (!consultation) {
+      return res.status(404).json({ message: "Consultation not found" });
+    }
+    await Consultation.findByIdAndDelete(consultationId);
+    res.status(200).json({ message: "Appointment cancelled" });
+  } catch (error) {
+    console.error("Error deleting consultation: ", error);
+    res.status(500).json({ message: "Server error." });
+  }
+}
+module.exports = { createConsultation, getClinicConsultations, updateConsultationStatus, getConsultationStats, getConfirmedBookingsWithoutDriver, deleteConsultation};

@@ -121,6 +121,23 @@ const UserProfile = () => {
     setChatPet(pet);
     setShowChatbot(true);
   };
+
+  const handleButtonCancel= async (consultation) => {
+    try {
+    if (consultation.status === "confirmed") {
+      alert("Cannot cancel confirmed appointment.");
+      return;
+    }
+    if (consultation.status === "pending") {
+      const res = await API.delete(`/consultation/${consultation._id}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      await fetchProfile();
+    }
+  } catch (err) {
+    alert(err.response?.data?.message || "Cancellation failed");
+  }
+  }
   const PetCard = ({ pet, onClose }) => {
     return (
       <motion.div
@@ -427,7 +444,7 @@ const UserProfile = () => {
               <button
                 onClick={() => {
                   // Add cancel functionality here
-                  alert("Cancel functionality would go here");
+                  handleButtonCancel(consultation);
                 }}
                 className="flex-1 px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors duration-200"
               >
@@ -439,7 +456,7 @@ const UserProfile = () => {
                 <button
                   onClick={() => {
                     // Add cancel functionality here
-                    alert("Cancel functionality would go here");
+                    handleButtonCancel(consultation);
                   }}
                   className="flex-1 px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors duration-200"
                 >

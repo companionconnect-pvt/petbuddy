@@ -142,3 +142,107 @@ exports.fetchAllClinics = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+exports.getClinicProfile = async(req, res) => {
+  try {
+    const petClinicId = req.user.id;
+    const clinic = await PetClinic.findById(petClinicId);
+    if (!clinic)
+      return res.status(404).json({ message: "PetClinic not found" });
+
+    res.status(200).json(clinic);
+
+  } catch (error) {
+    console.error("Error fetching profile data: ", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+exports.updateClinicProfile = async (req, res) => {
+  try {
+    const petClinicId = req.user.id;
+    
+    // Validate required fields
+    if (!req.body || Object.keys(req.body).length === 0) {
+      return res.status(400).json({ message: "No updates provided" });
+    }
+
+    // Find clinic first to ensure it exists
+    const clinic = await PetClinic.findById(petClinicId).select('-password');
+    if (!clinic) {
+      return res.status(404).json({ message: "Pet Clinic not found" });
+    }
+
+    // Prepare updates object
+    const updates = {};
+    const allowedFields = [
+      'name', 'email', 'phone', 'specialization', 'experience', 
+      'address', 'clinicAddress'
+    ];
+
+    // Validate and process updates
+    for (const field of allowedFields) {
+      if (req.body[field] !== undefined) {
+        if (field === 'address') {
+          updates.address = {
+            ...clinic.address,
+            ...req.body.address
+          };
+        } else if (field === 'clinicAddress') {
+          updates.clinicAddress = {
+            ...clinic.clinicAddress,
+            ...req.body.clinicAddress
+          };
+        } else {
+          updates[field] = req.body[field];
+        }
+      }
+    }
+
+    // Handle geocoding if address changed
+    if (req.body.address) {
+      try {
+        const addressString = `${updates.address.street}, ${updates.address.city}, ${updates.address.state}`;
+        const { lat, lng } = await getCoordinates(addressString);
+        updates.latitude = lat;
+        updates.longitude = lng;
+      } catch (geocodeError) {
+        console.error("Geocoding failed:", geocodeError);
+        // Continue without failing - just don't update coordinates
+      }
+    }
+
+    // Perform the update
+    const updatedClinic = await PetClinic.findByIdAndUpdate(
+      petClinicId,
+      { $set: updates },
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    if (!updatedClinic) {
+      return res.status(500).json({ message: "Update failed" });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: updatedClinic
+    });
+
+  } catch (error) {
+    console.error("Error updating clinic profile:", error);
+    
+    // Handle validation errors specifically
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ 
+        success: false,
+        message: "Validation failed",
+        errors: error.errors 
+      });
+    }
+
+    res.status(500).json({ 
+      success: false,
+      message: error.message || "Internal server error" 
+    });
+  }
+};
