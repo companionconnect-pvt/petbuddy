@@ -1,4 +1,5 @@
 const SibApiV3Sdk = require('sib-api-v3-sdk');
+const axios = require('axios');
 let defaultClient = SibApiV3Sdk.ApiClient.instance;
 
 let apiKey = defaultClient.authentications['api-key'];
@@ -9,10 +10,10 @@ async function userSignup(data) {
       let apiInstance = new SibApiV3Sdk.ContactsApi();
 
       let createContact = new SibApiV3Sdk.CreateContact();
-      
-      createContact.email = data.email;
-      createContact.attributes = {'FIRSTNAME' : data.name, 'SMS':`+91${data.phoneNumber}`};
+
       createContact.ext_id = data._id;
+      createContact.attributes = {'EMAIL': data.email,'FIRSTNAME' : data.name, 'SMS':`+91${data.phoneNumber}`};
+      createContact.updateEnabled = true;
       createContact.listIds = [6]
       
       const res = await apiInstance.createContact(createContact).then(function(data) {
@@ -61,24 +62,37 @@ async function sendNewUserMail(data) {
 
 async function updateUserData(data) {
   try {
-    let apiInstance = new SibApiV3Sdk.ContactsApi();
+    const apiKey = process.env.BREVO_API_KEY; // Replace with your actual API key
+    const extId = data._id; // External ID of the contact
+    const url = `https://api.brevo.com/v3/contacts/${encodeURIComponent(extId)}?identifierType=ext_id`;
 
-  let identifier = data._id; 
+    const updateContact = {
+      attributes: {
+        EMAIL: data.email,
+        FIRSTNAME: data.name,
+        SMS: `+91${data.phoneNumber}`
+      }
+    };
 
-  let updateContact = new SibApiV3Sdk.UpdateContact(); 
+    const headers = {
+      'api-key': apiKey,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    };
 
-  updateContact.attributes = {'EMAIL':data.email,'FIRSTNAME':data.name, 'SMS':data.phoneNumber};
-
-  const res = await apiInstance.updateContact(identifier, updateContact).then(function() {
-  console.log('API called successfully.');
-}, function(error) {
-  console.error(error);
-});
-  }catch (error) {
-    console.error("Error updating user data: ", error);
+    const response = await axios.put(url, updateContact, { headers });
+    console.log('Contact updated successfully:', response.data);
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      console.error('API Error:', error.response.data);
+    } else {
+      console.error('Error:', error.message);
+    }
     throw error;
   }
 }
+
 
 async function sendConsultationConfirmation(data) {
   try {

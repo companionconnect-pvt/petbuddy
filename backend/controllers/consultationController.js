@@ -5,47 +5,69 @@ const Consultation = require("../models/Consultation");
 const { sendConsultationConfirmation } = require("../utils/emailNotification");
 
 const createConsultation = async(req, res) => {
-    try {
-        console.log(req.body);
-        const { petClinicId, petId, appointmentDate, appointmentTime, mode, status, notes, payment } = req.body;
-        const userId = req.user.id;
+  try {
+      console.log(req.body);
+      const { petClinicId, petId, appointmentDate, appointmentTime, mode, status, notes, payment } = req.body;
+      const userId = req.user.id;
+      const user = await User.findById(userId);
+      const clinic = await PetClinic.findById(petClinicId);
+      const newConsultation = new Consultation({
+          userId,
+          petClinicId,
+          petId,
+          appointmentDate,
+          appointmentTime,
+          mode,
+          status,
+          source: {
+            address: {
+              street: user.address.street,
+              city: user.address.city,
+              state: user.address.state,
+              zip : user.address.zip,
+            },
+            latitude: user.latitude,
+            longitude: user.longitude,
+          },
+          destination: {
+            address: {
+              street: clinic.address.street,
+              city: clinic.address.city,
+              state: clinic.address.state,
+              zip : clinic.address.zip,
+            },
+            latitude: clinic.latitude,
+            longitude: clinic.longitude,
+          },
 
-        const newConsultation = new Consultation({
-            userId,
-            petClinicId,
-            petId,
-            appointmentDate,
-            appointmentTime,
-            mode,
-            status,
-            notes,
-            payment,
-        });
+          notes,
+          payment,
+      });
 
-        await newConsultation.save();
-        const updatePetClinicConsultations = await PetClinic.findByIdAndUpdate(petClinicId, {
-            $push: { consultations: newConsultation._id },
-        });
-        const updateUserBookings = await User.findByIdAndUpdate(userId, {
-            $push : { consultations: newConsultation._id },
-        })
-        const user = await User.findById(userId);
-        const pet = await Pet.findById(petId);
-        const data = {
-          _id: userId,
-          userName: user.name,
-          email: user.email,
-          petName: pet.name,
-          date: appointmentDate,
-          time: appointmentTime,
-          mode: mode,
-        }
-        const sendMail = await sendConsultationConfirmation(data);
-        return res.status(200).json({ consultation : newConsultation });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ error: "Server Error." });
-    }
+      await newConsultation.save();
+      const updatePetClinicConsultations = await PetClinic.findByIdAndUpdate(petClinicId, {
+          $push: { consultations: newConsultation._id },
+      });
+      const updateUserBookings = await User.findByIdAndUpdate(userId, {
+          $push : { consultations: newConsultation._id },
+      })
+      
+      const pet = await Pet.findById(petId);
+      const data = {
+        _id: userId,
+        userName: user.name,
+        email: user.email,
+        petName: pet.name,
+        date: appointmentDate,
+        time: appointmentTime,
+        mode: mode,
+      }
+      const sendMail = await sendConsultationConfirmation(data);
+      return res.status(200).json({ consultation : newConsultation });
+  } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "Server Error." });
+  }
 };
 
 const getClinicConsultations = async (req, res) => {

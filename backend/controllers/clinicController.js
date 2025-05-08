@@ -2,6 +2,7 @@ const PetClinic = require("../models/PetClinic");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const cloudinary = require("../utils/cloudinary");
+const { getCoordinates } = require("../utils/coordinates");
 
 exports.signup = async (req, res) => {
   try {
@@ -48,7 +49,8 @@ exports.signup = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
+    const addressString = `${street}, ${city}, ${state}`;
+    const { lat, lng } = await getCoordinates(addressString);
     const newClinic = new PetClinic({
       name,
       email,
@@ -66,6 +68,8 @@ exports.signup = async (req, res) => {
         state,
         zip,
       },
+      latitude: lat,
+      longitude: lng,
       clinicAddress: {
         openingHours,
         closingHours,

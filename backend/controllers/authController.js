@@ -2,6 +2,7 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { userSignup, sendNewUserMail } = require("../utils/emailNotification");
+const { getCoordinates } = require("../utils/coordinates");
 
 exports.signup = async (req, res) => {
   const {
@@ -19,13 +20,16 @@ exports.signup = async (req, res) => {
       return res.status(400).json({ message: "Email already exists" });
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
+    const addressString = `${address.street}, ${address.city}, ${address.state}`;
+    const { lat, lng } = await getCoordinates(addressString);
     const user = await User.create({
       name,
       email,
       phoneNumber,
       password: hashedPassword,
       address,
+      latitude: lat,
+      longitude: lng,
       pets: [],
       bookings: [],
       consultations: [],
