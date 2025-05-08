@@ -78,6 +78,12 @@ io.on("connection", (socket) => {
     // Broadcast to all users in the ticket room
     io.to(ticketId).emit("receiveMessage", chatMessage);
   });
+  socket.on("locationUpdate", (location) => {
+    console.log("📍 Location update received:", location);
+
+    // Broadcast location to all other clients (except sender)
+    socket.broadcast.emit("driverLocation", location);
+  });
 
   socket.on("disconnect", () => {
     console.log("❎ A user disconnected");
