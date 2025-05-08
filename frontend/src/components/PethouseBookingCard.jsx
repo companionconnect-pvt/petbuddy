@@ -28,10 +28,6 @@ const PetHouseBookingCard = () => {
   }, []);
 
   const handleCloseModal = () => setSelectedBooking(null);
-  const handleCancelBooking = () => alert("Cancel functionality would go here");
-  const handleRescheduleBooking = () =>
-    alert("Reschedule functionality would go here");
-
   if (loading)
     return <p className="text-center text-gray-500">Loading bookings...</p>;
 
@@ -146,8 +142,6 @@ const PetHouseBookingCard = () => {
         <PetHouseBookingCardModal
           booking={selectedBooking}
           onClose={handleCloseModal}
-          onCancel={handleCancelBooking}
-          onReschedule={handleRescheduleBooking}
         />
       )}
     </>
