@@ -14,6 +14,7 @@ import {
 } from "react-icons/fi";
 import { RiShieldUserLine } from "react-icons/ri";
 import ChatbotModal from "./chatbotModal";
+import PethouseBookingCard from "./PethouseBookingCard";
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);
@@ -22,7 +23,7 @@ const UserProfile = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPet, setSelectedPet] = useState(null);
   const [showPetCard, setShowPetCard] = useState(false);
-  const [bookingID, setbookingID] =useState("");
+  const [bookingID, setbookingID] = useState("");
   const [showChatbot, setShowChatbot] = useState(false);
   const [chatPet, setChatPet] = useState(null);
   const [selectedConsultation, setSelectedConsultation] = useState(null);
@@ -30,10 +31,12 @@ const UserProfile = () => {
   const [petClinics, setPetClinics] = useState(null);
   const navigate = useNavigate();
 
-  const handleButtonClick = () => { // replace with the actual room ID
+  const handleButtonClick = () => {
+    // replace with the actual room ID
     navigate(`/video-call/${bookingID}`);
   };
-  const handleButtonClickChat = () => { // replace with the actual room ID
+  const handleButtonClickChat = () => {
+    // replace with the actual room ID
     navigate(`/chat/${bookingID}`);
   };
 
@@ -42,7 +45,7 @@ const UserProfile = () => {
     fetchPetClinics();
   }, []);
 
-  const fetchPetClinics = async() => {
+  const fetchPetClinics = async () => {
     setIsLoading(true);
     try {
       const res = await API.get("/petclinic/");
@@ -53,7 +56,7 @@ const UserProfile = () => {
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
   const fetchProfile = async () => {
     setIsLoading(true);
@@ -142,7 +145,7 @@ const UserProfile = () => {
               ✕
             </button>
           </div>
-  
+
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div>
               <p className="text-sm text-gray-500">Species</p>
@@ -165,10 +168,12 @@ const UserProfile = () => {
               <p className="font-medium capitalize">{pet.gender}</p>
             </div>
           </div>
-  
+
           {/* Medical History Section */}
           <div className="mb-6">
-            <h4 className="text-lg font-semibold text-gray-800 mb-3">Medical History</h4>
+            <h4 className="text-lg font-semibold text-gray-800 mb-3">
+              Medical History
+            </h4>
             {pet.medicalHistory && pet.medicalHistory.length > 0 ? (
               <div className="space-y-4">
                 {pet.medicalHistory.map((medical, index) => (
@@ -177,30 +182,32 @@ const UserProfile = () => {
                       <div>
                         <p className="text-xs text-gray-500">Date</p>
                         <p className="text-sm font-medium">
-                          {new Date(medical.date).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric'
+                          {new Date(medical.date).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
                           })}
                         </p>
                       </div>
                       <div>
                         <p className="text-xs text-gray-500">Clinic</p>
                         <p className="text-sm font-medium capitalize">
-                          {medical.doctor || 'Not specified'}
+                          {medical.doctor || "Not specified"}
                         </p>
                       </div>
                     </div>
                     <div className="mb-2">
                       <p className="text-xs text-gray-500">Description</p>
                       <p className="text-sm font-medium">
-                        {medical.description || 'No description'}
+                        {medical.description || "No description"}
                       </p>
                     </div>
                     {medical.treatment && (
                       <div className="mb-2">
                         <p className="text-xs text-gray-500">Treatment</p>
-                        <p className="text-sm font-medium">{medical.treatment}</p>
+                        <p className="text-sm font-medium">
+                          {medical.treatment}
+                        </p>
                       </div>
                     )}
                     {medical.notes && (
@@ -213,10 +220,12 @@ const UserProfile = () => {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 text-sm">No medical history recorded</p>
+              <p className="text-gray-500 text-sm">
+                No medical history recorded
+              </p>
             )}
           </div>
-  
+
           <div className="flex space-x-3">
             <button
               onClick={() => handleChatClick(pet)}
@@ -247,9 +256,11 @@ const UserProfile = () => {
 
   const ConsultationCard = ({ consultation, onClose }) => {
     // Find the pet associated with this consultation
-    const pet = user.pets.find(p => p._id === consultation.petId);
-    const petClinic = petClinics.find(p => p._id === consultation.petClinicId);
-  
+    const pet = user.pets.find((p) => p._id === consultation.petId);
+    const petClinic = petClinics.find(
+      (p) => p._id === consultation.petClinicId
+    );
+
     return (
       <motion.div
         initial={{ opacity: 0 }}
@@ -271,13 +282,13 @@ const UserProfile = () => {
               </h3>
               {pet && (
                 <>
-                <p className="text-gray-600">
-                  For {pet.name} ({pet.breed})
-                </p>
-                <p className="text-gray-600">
-                {consultation.mode.toUpperCase()} Consultation
-              </p>
-              </>
+                  <p className="text-gray-600">
+                    For {pet.name} ({pet.breed})
+                  </p>
+                  <p className="text-gray-600">
+                    {consultation.mode.toUpperCase()} Consultation
+                  </p>
+                </>
               )}
             </div>
             <button
@@ -287,7 +298,7 @@ const UserProfile = () => {
               ✕
             </button>
           </div>
-  
+
           <div className="space-y-4 mb-6">
             <div className="flex items-start">
               <div className="p-2 rounded-lg bg-blue-50 text-blue-600 mr-3">
@@ -296,33 +307,43 @@ const UserProfile = () => {
               <div>
                 <p className="text-sm text-gray-500">Date & Time</p>
                 <p className="font-medium">
-                  {new Date(consultation.appointmentDate).toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}
-                  {consultation.appointmentTime && ` at ${consultation.appointmentTime}`}
+                  {new Date(consultation.appointmentDate).toLocaleDateString(
+                    "en-US",
+                    {
+                      weekday: "long",
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    }
+                  )}
+                  {consultation.appointmentTime &&
+                    ` at ${consultation.appointmentTime}`}
                 </p>
               </div>
             </div>
-  
+
             <div className="flex items-start">
               <div className="p-2 rounded-lg bg-purple-50 text-purple-600 mr-3">
                 <RiShieldUserLine size={18} />
               </div>
               <div>
                 <p className="text-sm text-gray-500">Status</p>
-                <p className={`font-medium capitalize ${
-                  consultation.status === 'confirmed' ? 'text-green-600' :
-                  consultation.status === 'pending' ? 'text-yellow-600' :
-                  consultation.status === 'cancelled' ? 'text-red-600' : ''
-                }`}>
+                <p
+                  className={`font-medium capitalize ${
+                    consultation.status === "confirmed"
+                      ? "text-green-600"
+                      : consultation.status === "pending"
+                      ? "text-yellow-600"
+                      : consultation.status === "cancelled"
+                      ? "text-red-600"
+                      : ""
+                  }`}
+                >
                   {consultation.status}
                 </p>
               </div>
             </div>
-  
+
             {consultation.mode === "In-Person" && (
               <div className="flex items-start">
                 <div className="p-2 rounded-lg bg-green-50 text-green-600 mr-3">
@@ -335,38 +356,60 @@ const UserProfile = () => {
                   </p> */}
                   {consultation.petClinicId && (
                     <p className="text-gray-600 text-base font-medium">
-                      {petClinic.address.street}, {petClinic.address.city}, {petClinic.address.state}
+                      {petClinic.address.street}, {petClinic.address.city},{" "}
+                      {petClinic.address.state}
                     </p>
                   )}
                 </div>
               </div>
             )}
-  
+
             {consultation.payment && (
               <div className="flex items-start">
                 <div className="p-2 rounded-lg bg-amber-50 text-amber-600 mr-3">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
                     <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" />
-                    <path fillRule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clipRule="evenodd" />
+                    <path
+                      fillRule="evenodd"
+                      d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Payment</p>
                   <p className="font-medium">
-                    {consultation.payment.amount ? `₹${consultation.payment.amount}` : 'No fee specified'}
+                    {consultation.payment.amount
+                      ? `₹${consultation.payment.amount}`
+                      : "No fee specified"}
                   </p>
                   <p className="text-gray-600 text-sm capitalize">
-                    {consultation.payment.method} ({consultation.payment.status})
+                    {consultation.payment.method} ({consultation.payment.status}
+                    )
                   </p>
                 </div>
               </div>
             )}
-  
+
             {consultation.notes && (
               <div className="flex items-start">
                 <div className="p-2 rounded-lg bg-gray-50 text-gray-600 mr-3">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clipRule="evenodd" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                 </div>
                 <div>
@@ -378,59 +421,61 @@ const UserProfile = () => {
               </div>
             )}
           </div>
-  
+
           <div className="flex space-x-3 pt-4 border-t border-gray-100">
-            {consultation.status === 'pending' && (
+            {consultation.status === "pending" && (
               <button
                 onClick={() => {
                   // Add cancel functionality here
-                  alert('Cancel functionality would go here');
+                  alert("Cancel functionality would go here");
                 }}
                 className="flex-1 px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors duration-200"
               >
                 Cancel Appointment
               </button>
             )}
-            {consultation.status === 'confirmed' && (
+            {consultation.status === "confirmed" && (
               <>
-              <button
-                onClick={() => {
-                  // Add cancel functionality here
-                  alert('Cancel functionality would go here');
-                }}
-                className="flex-1 px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors duration-200"
-              >
-                Cancel Appointment
-              </button>
-              <button
-                onClick={() => {
-                  // Add cancel functionality here
-                  handleButtonClick();
-                }}
-                className="flex-1 px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors duration-200"
-              >
-                Video Call
-              </button>
-              <button
-                onClick={() => {
-                  // Add cancel functionality here
-                  handleButtonClickChat();
-                }}
-                className="flex-1 px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors duration-200"
-              >
-                Chat
-              </button>
+                <button
+                  onClick={() => {
+                    // Add cancel functionality here
+                    alert("Cancel functionality would go here");
+                  }}
+                  className="flex-1 px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors duration-200"
+                >
+                  Cancel Appointment
+                </button>
+                <button
+                  onClick={() => {
+                    // Add cancel functionality here
+                    handleButtonClick();
+                  }}
+                  className="flex-1 px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors duration-200"
+                >
+                  Video Call
+                </button>
+                <button
+                  onClick={() => {
+                    // Add cancel functionality here
+                    handleButtonClickChat();
+                  }}
+                  className="flex-1 px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors duration-200"
+                >
+                  Chat
+                </button>
               </>
             )}
             <button
               onClick={() => {
                 // Add reschedule functionality here
-                alert('Reschedule functionality would go here');
+                alert("Reschedule functionality would go here");
               }}
               className={`flex-1 px-4 py-2 text-[#F27781] border border-[#F27781] rounded-lg hover:bg-[#F27781] hover:text-white transition-colors duration-200 ${
-                consultation.status === 'cancelled' ? 'opacity-50 cursor-not-allowed' : ''
+                consultation.status === "cancelled"
+                  ? "opacity-50 cursor-not-allowed"
+                  : ""
               }`}
-              disabled={consultation.status === 'cancelled'}
+              disabled={consultation.status === "cancelled"}
             >
               Reschedule
             </button>
@@ -635,7 +680,7 @@ const UserProfile = () => {
       </div>
 
       {/* Premium Pets and Bookings Sections */}
-      <div className="grid lg:grid-cols-2 gap-8 mt-12">
+      <div className="grid lg:grid-cols-3 gap-8 mt-12">
         {/* Premium Pets Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -665,11 +710,13 @@ const UserProfile = () => {
                   whileHover={{ scale: 1.01 }}
                   className="border border-gray-200 rounded-xl p-5 hover:shadow-xs transition-all duration-300"
                 >
-                  <div className="flex items-start space-x-4"
-                  onClick={() => {
-                    setSelectedPet(pet);
-                    setShowPetCard(true);
-                  }}>
+                  <div
+                    className="flex items-start space-x-4"
+                    onClick={() => {
+                      setSelectedPet(pet);
+                      setShowPetCard(true);
+                    }}
+                  >
                     <div className="flex-shrink-0">
                       <div className="h-14 w-14 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
                         {pet.photo ? (
@@ -686,9 +733,7 @@ const UserProfile = () => {
                       </div>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div
-                        className="flex justify-between items-start"
-                      >
+                      <div className="flex justify-between items-start">
                         <div>
                           <p className="text-lg font-semibold text-gray-900 truncate">
                             {pet.name}
@@ -760,7 +805,9 @@ const UserProfile = () => {
         >
           <div className="flex justify-between items-center mb-8">
             <div>
-              <h3 className="text-2xl font-bold text-gray-900">My Bookings</h3>
+              <h3 className="text-2xl font-bold text-gray-900">
+                Pet Clinic Bookings
+              </h3>
               <p className="text-gray-500">View and manage appointments</p>
             </div>
             <button
@@ -800,7 +847,9 @@ const UserProfile = () => {
                 >
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className={`text-lg font-semibold text-gray-900 capitalize`}>
+                      <p
+                        className={`text-lg font-semibold text-gray-900 capitalize`}
+                      >
                         {booking.serviceType.name}
                       </p>
                       <div className="flex items-center space-x-4 mt-2">
@@ -854,64 +903,74 @@ const UserProfile = () => {
                 </motion.li>
               ))}
               {user.consultations.map((consultation) => {
-                const petName = user.pets.find(p =>p._id === consultation.petId);
-                const clinicName = petClinics.find(p => p._id === consultation.petClinicId);
+                const petName = user.pets.find(
+                  (p) => p._id === consultation.petId
+                );
+                const clinicName = petClinics.find(
+                  (p) => p._id === consultation.petClinicId
+                );
                 return (
-                <motion.li
-                  key={`consultation-${consultation._id}`}
-                  whileHover={{ scale: 1.01 }}
-                  className="border border-gray-200 rounded-xl p-5 hover:shadow-xs transition-all duration-300"
-                >
-                  <div className="flex justify-between items-start"
-                  onClick={() => {
-                    setSelectedConsultation(consultation);
-                    setbookingID(consultation._id);
-                    setShowConsultationCard(true);
-                  }}>
-                    <div>
-                      <p className={`text-lg font-semibold text-gray-900 capitalize`}>
-                        {petName.name} - {clinicName.name}
-                      </p>
-                      <div className="flex items-center space-x-4 mt-2">
-                        <div className="flex items-center text-sm text-gray-500">
-                          <FiCalendar className="mr-1" size={14} />
-                          <span>
-                            {new Date(consultation.appointmentDate).toLocaleDateString(
-                              "en-US",
-                              {
+                  <motion.li
+                    key={`consultation-${consultation._id}`}
+                    whileHover={{ scale: 1.01 }}
+                    className="border border-gray-200 rounded-xl p-5 hover:shadow-xs transition-all duration-300"
+                  >
+                    <div
+                      className="flex justify-between items-start"
+                      onClick={() => {
+                        setSelectedConsultation(consultation);
+                        setbookingID(consultation._id);
+                        setShowConsultationCard(true);
+                      }}
+                    >
+                      <div>
+                        <p
+                          className={`text-lg font-semibold text-gray-900 capitalize`}
+                        >
+                          {petName.name} - {clinicName.name}
+                        </p>
+                        <div className="flex items-center space-x-4 mt-2">
+                          <div className="flex items-center text-sm text-gray-500">
+                            <FiCalendar className="mr-1" size={14} />
+                            <span>
+                              {new Date(
+                                consultation.appointmentDate
+                              ).toLocaleDateString("en-US", {
                                 month: "short",
                                 day: "numeric",
                                 year: "numeric",
-                              }
-                            )} 
-                          </span>
-                          <span className= "ml-1.5">
-                            {consultation.appointmentTime || ""}
-                          </span>
+                              })}
+                            </span>
+                            <span className="ml-1.5">
+                              {consultation.appointmentTime || ""}
+                            </span>
+                          </div>
                         </div>
                       </div>
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          consultation.status === "confirmed"
+                            ? "bg-green-100 text-green-800"
+                            : consultation.status === "pending"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : consultation.status === "cancelled"
+                            ? "bg-red-100 text-red-800"
+                            : "bg-gray-100 text-gray-800"
+                        }`}
+                      >
+                        {consultation.status}
+                      </span>
                     </div>
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        consultation.status === "confirmed"
-                          ? "bg-green-100 text-green-800"
-                          : consultation.status === "pending"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : consultation.status === "cancelled"
-                          ? "bg-red-100 text-red-800"
-                          : "bg-gray-100 text-gray-800"
-                      }`}
-                    >
-                      {consultation.status}
-                    </span>
-                  </div>
-                  
-                </motion.li>
-              )})}
+                  </motion.li>
+                );
+              })}
             </ul>
           )}
         </motion.div>
+
+        <PethouseBookingCard></PethouseBookingCard>
       </div>
+
       <AnimatePresence>
         {showPetCard && (
           <PetCard

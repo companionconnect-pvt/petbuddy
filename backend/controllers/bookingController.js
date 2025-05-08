@@ -47,7 +47,7 @@ exports.createBooking = async (req, res) => {
       startDate: startDate,
       endDate: endDate,
       service: serviceType[0].name,
-      }
+    };
     const sendMail = await sendBookingConfirmation(data);
     res
       .status(201)
@@ -72,7 +72,7 @@ exports.getAllBookings = async (req, res) => {
       .populate("petHouseId", "name email")
       .populate("petId", "name type breed");
 
-    res.status(200).json({ bookings });
+    res.status(200).json(bookings);
   } catch (err) {
     console.error("Error fetching bookings:", err);
     res.status(500).json({ message: "Server error while fetching bookings" });
