@@ -1,5 +1,7 @@
 const Booking = require("../models/BookingPethouse");
 const User = require("../models/User");
+const Pet = require("../models/Pet");
+const { sendBookingConfirmation } = require("../utils/emailNotification");
 
 // 1. Create a booking (already implemented)
 
@@ -35,6 +37,18 @@ exports.createBooking = async (req, res) => {
     const updateUserBookings = await User.findByIdAndUpdate(userId, {
       $push: { bookings: newBooking._id },
     });
+    const user = await User.findById(userId);
+    const pet = await Pet.findById(petId);
+    const data = {
+      _id: userId,
+      userName: user.name,
+      email: user.email,
+      petName: pet.name,
+      startDate: startDate,
+      endDate: endDate,
+      service: serviceType[0].name,
+      }
+    const sendMail = await sendBookingConfirmation(data);
     res
       .status(201)
       .json({ message: "Booking created successfully", booking: newBooking });

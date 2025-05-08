@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const Pet = require('../models/Pet'); 
 const Booking = require('../models/BookingPethouse');
 const Consultation = require("../models/Consultation"); 
+const { updateUserData } = require("../utils/emailNotification");
 
 const JWT_SECRET = "Yg#8s9iFgT!pM2nA5w@QeZ6rLp^RtZ3k";
 
@@ -34,6 +35,13 @@ const updateCurrentUser = async(req, res) => {
         }
 
         const updateUser = await User.findByIdAndUpdate(req.user.id, updates);
+        const data = {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          phoneNumber: user.phoneNumber,
+        }
+        const updateContact = await updateUserData(data);
         res.status(200).json(user);
     } catch(error) {
       console.error("Error fetching user data", error);

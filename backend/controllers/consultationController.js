@@ -2,6 +2,7 @@ const PetClinic = require("../models/PetClinic");
 const User = require("../models/User");
 const Pet = require("../models/Pet");
 const Consultation = require("../models/Consultation");
+const { sendConsultationConfirmation } = require("../utils/emailNotification");
 
 const createConsultation = async(req, res) => {
     try {
@@ -28,7 +29,18 @@ const createConsultation = async(req, res) => {
         const updateUserBookings = await User.findByIdAndUpdate(userId, {
             $push : { consultations: newConsultation._id },
         })
-        
+        const user = await User.findById(userId);
+        const pet = await Pet.findById(petId);
+        const data = {
+          _id: userId,
+          userName: user.name,
+          email: user.email,
+          petName: pet.name,
+          date: appointmentDate,
+          time: appointmentTime,
+          mode: mode,
+        }
+        const sendMail = await sendConsultationConfirmation(data);
         return res.status(200).json({ consultation : newConsultation });
     } catch (error) {
         console.error(error);
