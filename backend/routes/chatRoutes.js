@@ -4,18 +4,19 @@ const Chat = require("../models/Chat");
 
 router.post("/send", async (req, res) => {
   try {
-    const { ticketId, message, senderName, senderId } = req.body;
+    const { ticketId, encryptedMessage, senderName, senderId } = req.body;
 
-    console.log(ticketId);
-    console.log(message);
-    console.log(senderName);
-    console.log(senderId);
-
-    if (!ticketId || !message || !senderName || !senderId) {
+    if (!ticketId || !encryptedMessage || !senderName || !senderId) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
-    const chatMessage = new Chat({ ticketId, message, senderName, senderId });
+    const chatMessage = new Chat({
+      ticketId,
+      encryptedMessage,
+      senderName,
+      senderId
+    });
+
     await chatMessage.save();
 
     res.json({ success: true, chatMessage });
