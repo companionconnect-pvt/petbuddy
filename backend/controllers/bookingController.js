@@ -152,3 +152,55 @@ exports.getConfirmedBookingsWithoutDriver = async (req, res) => {
     res.status(500).json({ message: "Server error while fetching bookings." });
   }
 };
+
+exports.deleteUsingId = async (req, res) => {
+  console.log("Deleting booking with ID:", req.params.id);
+  try {
+    const booking = await Booking.findById(req.params.id);
+    if (!booking) return res.status(404).json({ error: "Booking not found" });
+
+    if (booking.status === "confirmed") {
+      return res.status(400).json({ error: "Cannot cancel confirmed booking" });
+    }
+
+    await Booking.findByIdAndDelete(req.params.id);
+    res.status(200).json({ message: "Booking cancelled" });
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+exports.rescheduleAppointment = async (req, res) => {
+  console.log("Rescheduling booking with ID:", req.params.id);
+  const { startDate, endDate } = req.body;
+
+  try {
+    const booking = await Booking.findById(req.params.id);
+    if (!booking) return res.status(404).json({ error: "Booking not found" });
+
+    const now = new Date();
+    const start = new Date(booking.startDate);
+    const daysBefore = (start - now) / (1000 * 60 * 60 * 24);
+
+    if (booking.status === "confirmed" && daysBefore < 2) {
+      return res
+        .status(400)
+        .json({ error: "Too late to reschedule confirmed booking" });
+    }
+
+    // Validate new dates
+    if (new Date(startDate) >= new Date(endDate)) {
+      return res
+        .status(400)
+        .json({ error: "End date must be after start date" });
+    }
+
+    booking.startDate = new Date(startDate);
+    booking.endDate = new Date(endDate);
+    await booking.save();
+
+    res.status(200).json({ message: "Booking rescheduled" });
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+};
