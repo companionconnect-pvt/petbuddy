@@ -31,8 +31,6 @@ const PetHouseBookingCard = () => {
   const handleCancelBooking = () => alert("Cancel functionality would go here");
   const handleRescheduleBooking = () =>
     alert("Reschedule functionality would go here");
-  const handleVideoCall = () => alert("Starting video call...");
-  const handleChat = () => alert("Opening chat...");
 
   if (loading)
     return <p className="text-center text-gray-500">Loading bookings...</p>;
@@ -150,8 +148,6 @@ const PetHouseBookingCard = () => {
           onClose={handleCloseModal}
           onCancel={handleCancelBooking}
           onReschedule={handleRescheduleBooking}
-          onVideoCall={handleVideoCall}
-          onChat={handleChat}
         />
       )}
     </>

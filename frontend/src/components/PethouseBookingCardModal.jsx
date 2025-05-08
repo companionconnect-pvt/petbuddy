@@ -1,15 +1,25 @@
 import { motion } from "framer-motion";
 import { FiCalendar, FiMapPin } from "react-icons/fi";
 import { RiShieldUserLine } from "react-icons/ri";
+import { useNavigate } from "react-router-dom";
 
 const PetHouseBookingCardModal = ({
   booking,
   onClose,
   onCancel,
-  onChat,
-  onVideoCall,
   onReschedule,
 }) => {
+  const navigate = useNavigate();
+  const bookingID = booking._id;
+
+  const handleVideoCall = () => {
+    navigate(`/video-call/${bookingID}`);
+  };
+
+  const handleChat = () => {
+    navigate(`/chat/${bookingID}`);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -21,7 +31,7 @@ const PetHouseBookingCardModal = ({
       <motion.div
         initial={{ scale: 0.9 }}
         animate={{ scale: 1 }}
-        className="bg-white rounded-2xl p-8 w-full max-w-md mx-4"
+        className="bg-white rounded-2xl p-8 w-full max-w-xl mx-4"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-start mb-6">
@@ -164,23 +174,21 @@ const PetHouseBookingCardModal = ({
             Reschedule
           </button>
 
-          {["Online", "Video"].includes(booking.mode) && (
-            <>
-              <button
-                onClick={onVideoCall}
-                className="flex-1 px-4 py-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition-colors duration-200"
-              >
-                Video Call
-              </button>
+          <>
+            <button
+              onClick={handleVideoCall}
+              className="flex-1 px-4 py-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition-colors duration-200"
+            >
+              Video Call
+            </button>
 
-              <button
-                onClick={onChat}
-                className="flex-1 px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors duration-200"
-              >
-                Chat
-              </button>
-            </>
-          )}
+            <button
+              onClick={handleChat}
+              className="flex-1 px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors duration-200"
+            >
+              Chat
+            </button>
+          </>
         </div>
       </motion.div>
     </motion.div>
