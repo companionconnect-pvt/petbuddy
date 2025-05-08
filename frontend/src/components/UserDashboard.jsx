@@ -7,14 +7,21 @@ import BookingModal from "./BookPethouseModal";
 import PetClinicModal from "./PetClinicModal";
 import ClinicBookingModal from "./ClinicBookingModal";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiMapPin, FiPhone, FiMail, FiClock, FiStar, FiChevronRight } from "react-icons/fi";
+import {
+  FiMapPin,
+  FiPhone,
+  FiMail,
+  FiClock,
+  FiStar,
+  FiChevronRight,
+} from "react-icons/fi";
 import { FaDog, FaClinicMedical } from "react-icons/fa";
 
 // Custom marker icons
 const customIcon = new L.Icon({
-  iconUrl: '/marker-icon.png', // Replace with your premium marker icon
-  iconRetinaUrl: '/marker-icon-2x.png',
-  shadowUrl: '/marker-shadow.png',
+  iconUrl: "/marker-icon.png", // Replace with your premium marker icon
+  iconRetinaUrl: "/marker-icon-2x.png",
+  shadowUrl: "/marker-shadow.png",
   iconSize: [38, 60],
   iconAnchor: [19, 60],
   popupAnchor: [1, -50],
@@ -38,7 +45,7 @@ const UserDashboard = () => {
         setLoading(true);
         const [pethouseRes, clinicRes] = await Promise.all([
           API.get("/pethouse/"),
-          API.get("/petclinic/")
+          API.get("/petclinic/"),
         ]);
         setPethouses(pethouseRes.data);
         setClinics(clinicRes.data);
@@ -60,16 +67,24 @@ const UserDashboard = () => {
       <div className="flex items-center">
         <div className="flex">
           {[...Array(full)].map((_, i) => (
-            <FiStar key={`full-${i}`} className="text-yellow-400 fill-current" />
+            <FiStar
+              key={`full-${i}`}
+              className="text-yellow-400 fill-current"
+            />
           ))}
           {[...Array(half)].map((_, i) => (
-            <FiStar key={`half-${i}`} className="text-yellow-400 fill-current opacity-50" />
+            <FiStar
+              key={`half-${i}`}
+              className="text-yellow-400 fill-current opacity-50"
+            />
           ))}
           {[...Array(empty)].map((_, i) => (
             <FiStar key={`empty-${i}`} className="text-gray-300" />
           ))}
         </div>
-        <span className="ml-1 text-sm text-gray-500">{rating?.toFixed(1) || 'New'}</span>
+        <span className="ml-1 text-sm text-gray-500">
+          {rating?.toFixed(1) || "New"}
+        </span>
       </div>
     );
   };
@@ -94,9 +109,10 @@ const UserDashboard = () => {
   };
 
   const filteredItems = (items) => {
-    return items.filter(item => 
-      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.address?.city.toLowerCase().includes(searchQuery.toLowerCase())
+    return items.filter(
+      (item) =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.address?.city.toLowerCase().includes(searchQuery.toLowerCase())
     );
   };
 
@@ -166,7 +182,8 @@ const UserDashboard = () => {
             <div className="flex items-center text-gray-600">
               <FiClock className="mr-2 text-gray-400" />
               <span className="text-sm">
-                {item.clinicAddress.openingHours} - {item.clinicAddress.closingHours}
+                {item.clinicAddress.openingHours} -{" "}
+                {item.clinicAddress.closingHours}
               </span>
             </div>
           )}
@@ -175,12 +192,14 @@ const UserDashboard = () => {
         <div className="mt-6 flex justify-between">
           {type === "clinic" ? (
             <button
-            className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all flex items-center"
-            onClick={() => openInfoModal(item, type)}
-          >
-            Details <FiChevronRight className="ml-1" />
-          </button>
-          ) : (<></>)}
+              className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all flex items-center"
+              onClick={() => openInfoModal(item, type)}
+            >
+              Details <FiChevronRight className="ml-1" />
+            </button>
+          ) : (
+            <></>
+          )}
           <button
             className="px-4 py-2 bg-gradient-to-r from-[#F27781] to-[#F27781] text-white rounded-lg hover:from-[#e85f6a] hover:to-[#e85f6a] transition-all shadow-md hover:shadow-lg"
             onClick={() => openBookingModal(item, type)}
@@ -208,23 +227,40 @@ const UserDashboard = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800">Pet Care Services</h1>
+            <h1 className="text-3xl font-bold text-gray-800">
+              Pet Care Services
+            </h1>
             <p className="text-gray-600 mt-2">
-              Find the best {activeTab === "pethouses" ? "pet houses" : "clinics"} for your furry friends
+              Find the best{" "}
+              {activeTab === "pethouses" ? "pet houses" : "clinics"} for your
+              furry friends
             </p>
           </div>
-          
+
           <div className="mt-4 md:mt-0 relative w-full md:w-64">
             <input
               type="text"
-              placeholder={`Search ${activeTab === "pethouses" ? "pet houses" : "clinics"}...`}
+              placeholder={`Search ${
+                activeTab === "pethouses" ? "pet houses" : "clinics"
+              }...`}
               className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F27781] focus:border-transparent shadow-sm"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
             <div className="absolute left-3 top-2.5 text-gray-400">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
               </svg>
             </div>
           </div>
@@ -259,7 +295,7 @@ const UserDashboard = () => {
           </button>
         </div>
 
-        <motion.div 
+        <motion.div
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -267,28 +303,36 @@ const UserDashboard = () => {
         >
           {activeTab === "pethouses" ? (
             filteredItems(pethouses).length > 0 ? (
-              filteredItems(pethouses).map((house) => renderCard(house, "pethouse"))
+              filteredItems(pethouses).map((house) =>
+                renderCard(house, "pethouse")
+              )
             ) : (
               <div className="col-span-3 text-center py-12">
                 <div className="text-gray-400 mb-4">
                   <FaDog className="inline-block text-4xl" />
                 </div>
-                <h3 className="text-xl font-medium text-gray-600">No pet houses found</h3>
-                <p className="text-gray-500 mt-2">Try adjusting your search query</p>
+                <h3 className="text-xl font-medium text-gray-600">
+                  No pet houses found
+                </h3>
+                <p className="text-gray-500 mt-2">
+                  Try adjusting your search query
+                </p>
               </div>
             )
+          ) : filteredItems(clinics).length > 0 ? (
+            filteredItems(clinics).map((clinic) => renderCard(clinic, "clinic"))
           ) : (
-            filteredItems(clinics).length > 0 ? (
-              filteredItems(clinics).map((clinic) => renderCard(clinic, "clinic"))
-            ) : (
-              <div className="col-span-3 text-center py-12">
-                <div className="text-gray-400 mb-4">
-                  <FaClinicMedical className="inline-block text-4xl" />
-                </div>
-                <h3 className="text-xl font-medium text-gray-600">No clinics found</h3>
-                <p className="text-gray-500 mt-2">Try adjusting your search query</p>
+            <div className="col-span-3 text-center py-12">
+              <div className="text-gray-400 mb-4">
+                <FaClinicMedical className="inline-block text-4xl" />
               </div>
-            )
+              <h3 className="text-xl font-medium text-gray-600">
+                No clinics found
+              </h3>
+              <p className="text-gray-500 mt-2">
+                Try adjusting your search query
+              </p>
+            </div>
           )}
         </motion.div>
       </div>
@@ -303,13 +347,15 @@ const UserDashboard = () => {
           />
         )}
 
-        {selectedItem && bookingModalOpen && modalType === "pethouse-booking" && (
-          <BookingModal
-            petHouse={selectedItem}
-            isOpen={bookingModalOpen}
-            onClose={closeModals}
-          />
-        )}
+        {selectedItem &&
+          bookingModalOpen &&
+          modalType === "pethouse-booking" && (
+            <BookingModal
+              petHouse={selectedItem}
+              isOpen={bookingModalOpen}
+              onClose={closeModals}
+            />
+          )}
 
         {selectedItem && bookingModalOpen && modalType === "clinic-booking" && (
           <ClinicBookingModal

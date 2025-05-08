@@ -28,6 +28,27 @@ const consultationSchema = new mongoose.Schema(
       method: { type: String, enum: ["upi", "card", "cash", "UPI", "Card", "Cash"], required: true },
       status: { type: String, enum: ["pending", "paid", "failed"], default: "pending" }
     },
+    source: {
+      address: {
+        street: { type: String },
+        city: { type: String },
+        state: { type: String },
+        zip: { type: String },
+      },
+      latitude: { type: Number },
+      longitude: { type: Number },
+    },
+
+    destination: {
+      address: {
+        street: { type: String },
+        city: { type: String },
+        state: { type: String },
+        zip: { type: String },
+      },
+      latitude: { type: Number },
+      longitude: { type: Number },
+    },
     driverId: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Driver",

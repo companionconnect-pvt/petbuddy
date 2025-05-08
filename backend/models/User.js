@@ -11,6 +11,8 @@ const userSchema = new mongoose.Schema({
     state: String,
     zip: String,
   },
+  latitude: { type: Number},
+  longitude: { type: Number },
   pets: [{ type: mongoose.Schema.Types.ObjectId, ref: "Pet" }],
   bookings: [{ type: mongoose.Schema.Types.ObjectId, ref: "Booking" }],
   consultations: [{ type: mongoose.Schema.Types.ObjectId, ref: "Consultation"}],

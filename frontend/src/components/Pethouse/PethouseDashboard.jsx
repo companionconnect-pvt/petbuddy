@@ -24,7 +24,7 @@ const PethouseDashboard = () => {
       const res = await API.get("/booking/all", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setBookings(res.data.bookings);
+      setBookings(res.data);
     } catch {
       alert("Failed to load bookings");
     } finally {
@@ -71,7 +71,6 @@ const PethouseDashboard = () => {
     }
   };
 
-  // Stats calculation
   const total = bookings.length;
   const confirmed = bookings.filter((b) => b.status === "confirmed").length;
   const pending = bookings.filter((b) => b.status === "pending").length;

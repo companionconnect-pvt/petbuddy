@@ -24,6 +24,8 @@ const petClinicSchema = new mongoose.Schema(
       state: { type: String, required: true },
       zip: { type: String, required: true },
     },
+    latitude: { type: Number},
+    longitude: { type: Number },
     clinicAddress: {
       amount: { type: Number, required: true, default: 0 },
       openingHours: { type: String, required: true }, // e.g., "9am - 5pm"
