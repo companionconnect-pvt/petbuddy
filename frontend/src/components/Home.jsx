@@ -16,6 +16,8 @@ const Home = () => {
   const handleLogin = () => navigate("/login");
   const handleSignup = () => navigate("/userDashboard");
   const handleProfile = () => navigate("/profile");
+  const handlePetClinicLogin = () => navigate("/petclinic/login");
+  const handlePetHouseLogin = () => navigate("/pethouse/login");
 
   // Animation variants
   const container = {
@@ -252,6 +254,72 @@ const Home = () => {
           </div>
         </div>
       </div>
+
+      {/* Provider Login Section */}
+      {!isLoggedIn && (
+        <div className="py-24 bg-white">
+          <div className="max-w-6xl mx-auto px-6">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-4xl font-bold text-[#222222] mb-4">Are You a Pet Service Provider?</h2>
+              <p className="text-lg text-gray-500 max-w-2xl mx-auto">
+                Join our network of premium pet care providers
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2 }}
+                className="bg-gradient-to-br from-[#F27781]/10 to-[#8B5CF6]/10 p-8 rounded-2xl border border-gray-200 hover:border-[#F27781] transition-all"
+              >
+                <div className="text-5xl mb-6">🏥</div>
+                <h3 className="text-2xl font-bold text-[#222222] mb-4">Pet Clinic</h3>
+                <p className="text-gray-600 mb-6">
+                  Offer your veterinary services to pet owners looking for premium care.
+                </p>
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={handlePetClinicLogin}
+                  className="w-full bg-gradient-to-r from-[#F27781] to-[#8B5CF6] text-white px-6 py-3 rounded-lg font-medium"
+                >
+                  Login as Clinic
+                </motion.button>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.4 }}
+                className="bg-gradient-to-br from-[#8B5CF6]/10 to-[#F27781]/10 p-8 rounded-2xl border border-gray-200 hover:border-[#8B5CF6] transition-all"
+              >
+                <div className="text-5xl mb-6">🏠</div>
+                <h3 className="text-2xl font-bold text-[#222222] mb-4">Pet House</h3>
+                <p className="text-gray-600 mb-6">
+                  Provide luxury boarding and daycare services for pets in your care.
+                </p>
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={handlePetHouseLogin}
+                  className="w-full bg-gradient-to-r from-[#8B5CF6] to-[#F27781] text-white px-6 py-3 rounded-lg font-medium"
+                >
+                  Login as Pet House
+                </motion.button>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* CTA Section */}
       <div className="py-24 bg-gradient-to-r from-[#F27781] to-[#8B5CF6] text-white">
