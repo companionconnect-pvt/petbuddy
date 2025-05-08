@@ -145,4 +145,21 @@ const getClinicConsultations = async (req, res) => {
       res.status(500).send('Server Error');
     }
   }; 
-module.exports = { createConsultation, getClinicConsultations, updateConsultationStatus, getConsultationStats };
+  const getConfirmedBookingsWithoutDriver = async (req, res) => {
+    try {
+      const bookings = await Consultation.find({
+        status: "confirmed",
+        isDriverAssigned: false,
+      })
+        .populate("userId", "name email")
+        .populate("petClinicId", "name")
+        .populate("petId", "name species breed");
+  
+      res.status(200).json(bookings);
+    } catch (err) {
+      console.error("Error fetching bookings:", err);
+      res.status(500).json({ message: "Server error while fetching bookings." });
+    }
+  };
+  
+module.exports = { createConsultation, getClinicConsultations, updateConsultationStatus, getConsultationStats, getConfirmedBookingsWithoutDriver};

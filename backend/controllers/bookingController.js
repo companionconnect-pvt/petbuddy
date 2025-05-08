@@ -136,3 +136,19 @@ exports.updateBookingStatus = async (req, res) => {
       .json({ message: "Server error while updating booking status" });
   }
 };
+exports.getConfirmedBookingsWithoutDriver = async (req, res) => {
+  try {
+    const bookings = await Booking.find({
+      status: "confirmed",
+      isDriverAssigned: false,
+    })
+      .populate("userId", "name email")
+      .populate("petHouseId", "name")
+      .populate("petId", "name type");
+
+    res.status(200).json(bookings);
+  } catch (err) {
+    console.error("Error fetching bookings:", err);
+    res.status(500).json({ message: "Server error while fetching bookings." });
+  }
+};

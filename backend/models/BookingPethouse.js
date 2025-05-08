@@ -66,6 +66,17 @@ const bookingSchema = new mongoose.Schema(
       latitude: { type: Number },
       longitude: { type: Number },
     },
+
+    // ✅ NEW FIELDS
+    driverId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Driver",
+      default: null, // Initially no driver assigned
+    },
+    isDriverAssigned: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

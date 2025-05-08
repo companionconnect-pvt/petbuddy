@@ -27,7 +27,16 @@ const consultationSchema = new mongoose.Schema(
       amount: { type: Number, required: true, default: 0 },
       method: { type: String, enum: ["upi", "card", "cash", "UPI", "Card", "Cash"], required: true },
       status: { type: String, enum: ["pending", "paid", "failed"], default: "pending" }
-    }
+    },
+    driverId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Driver",
+          default: null, // Initially no driver assigned
+        },
+        isDriverAssigned: {
+          type: Boolean,
+          default: false,
+        },
   },
   { timestamps: true, default: Date.now }
 );

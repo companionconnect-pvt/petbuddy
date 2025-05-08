@@ -5,6 +5,7 @@ const {
   getAllBookings,
   getBookingById,
   updateBookingStatus,
+  getConfirmedBookingsWithoutDriver
 } = require("../controllers/bookingController");
 
 const verifyToken = require("../middlewares/auth");
@@ -15,10 +16,13 @@ router.post("/createBooking", verifyToken, createBooking);
 // Get all bookings (filtered by user or pet house based on role)
 router.get("/all", verifyToken, getAllBookings);
 
+router.get("/confirmed-without-driver", verifyToken, getConfirmedBookingsWithoutDriver);
+
 // Get booking by ID
 router.get("/:id", verifyToken, getBookingById);
 
 // Update booking status (only allowed by pet house)
 router.patch("/:id/status", verifyToken, updateBookingStatus);
+
 
 module.exports = router;
