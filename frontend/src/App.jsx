@@ -35,6 +35,8 @@ function App() {
         <Route path="/driver-login" element={<DriverLogin />} />
         <Route path="/driverDashboard" element={<DriverDashboard />} />
         <Route path="/driver-profile" element={<DriverProfile />} />
+        <Route path="/chat/:ticketId" element={<Chat />} />
+        <Route path="/video-call/:roomId" element={<VideoCall />} />
 
         {/* PetHouse Routes */}
         <Route path="pethouse/signup" element={<PethouseSignup />} />
@@ -55,8 +57,8 @@ function App() {
           <Route path="/edituserprofile" element={<EditUserProfile />} />
           <Route path="/editpet/:petId" element={<EditPet />} />
           <Route path="/userDashboard" element={<UserDashboard />} />
-          <Route path="/video-call/:roomId" element={<VideoCall />} />
-          <Route path="/chat/:ticketId" element={<Chat />} />
+          
+          
         </Route>
 
         {/* Catch-all route */}
