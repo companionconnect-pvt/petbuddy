@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { CalendarIcon, ClipboardListIcon, ClockIcon, MapIcon, TruckIcon } from '@heroicons/react/outline';
-import { UserCircleIcon } from '@heroicons/react/solid';
+import { UserCircleIcon, BellIcon } from '@heroicons/react/solid';
 import MapComponent from './MapComponent';
 import FindBookings from './FindBookings';
 import activeTrips from './data/activeTripData.js';
@@ -107,11 +107,14 @@ const DriverDashboard = () => {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      {/* Sidebar */}
-      <aside className="w-20 lg:w-1/7 bg-white border-r border-[#F27781] px-4 py-6 flex flex-col justify-between">
+      {/* Sidebar - Enhanced with gradient and better spacing */}
+      <aside className="w-20 lg:w-64 bg-gradient-to-b from-indigo-900 to-purple-800 px-4 py-8 flex flex-col justify-between transition-all duration-300">
         <div>
-          <h2 className="text-2xl font-extrabold text-[#F27781] mb-8">Driver's Dashboard</h2>
-          <nav className="space-y-4 text-[#222222]">
+          <div className="flex items-center justify-center lg:justify-start mb-10 px-2">
+            <h2 className="text-xl lg:text-2xl font-bold text-white hidden lg:block">Driver Dashboard</h2>
+            <h2 className="text-xl font-bold text-white lg:hidden">DD</h2>
+          </div>
+          <nav className="space-y-2">
             {[
               ['Dashboard', ClipboardListIcon],
               ['Trips', TruckIcon],
@@ -121,75 +124,104 @@ const DriverDashboard = () => {
             ].map(([label, Icon]) => (
               <button
                 key={label}
-                className="flex items-center space-x-2 w-full text-left px-3 py-2 rounded-md hover:bg-[#F27781] hover:text-white transition"
+                className="flex items-center space-x-3 w-full text-left px-4 py-3 rounded-lg hover:bg-indigo-700 text-white transition-all duration-200 group"
               >
-                <Icon className="h-5 w-5" />
-                <span className="font-extrabold">{label}</span>
+                <Icon className="h-5 w-5 text-indigo-200 group-hover:text-white" />
+                <span className="font-medium hidden lg:block">{label}</span>
               </button>
             ))}
           </nav>
         </div>
         <button
           onClick={handleSignOut}
-          className="text-[#F27781] font-extrabold py-2 border border-[#F27781] rounded-md hover:bg-[#F27781] hover:text-white transition"
+          className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-indigo-700 text-white transition-all duration-200 group"
         >
-          Sign Out
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-indigo-200 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          <span className="font-medium hidden lg:block">Sign Out</span>
         </button>
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        {/* Topbar */}
-        <header className="bg-white px-6 py-4 flex justify-between items-center border-b border-gray-200">
-          <input
-            type="search"
-            placeholder="Search anything here…"
-            className="flex-1 max-w-md p-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#F27781]"
-          />
-          <div className="flex items-center space-x-4">
-            <button className="relative">
-              <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-[#F27781]" />
-              🔔
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Topbar - More refined with better shadows */}
+        <header className="bg-white px-6 py-4 flex justify-between items-center border-b border-gray-200 shadow-sm">
+          <div className="relative flex-1 max-w-md">
+            <input
+              type="search"
+              placeholder="Search anything here..."
+              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            />
+            <svg className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          <div className="flex items-center space-x-6">
+            <button className="relative text-gray-500 hover:text-gray-700">
+              <span className="absolute top-0 right-0 block h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white" />
+              <BellIcon className="h-6 w-6" />
             </button>
-            <Link to="/driver-profile" className="flex items-center space-x-2">
-              <UserCircleIcon className="h-8 w-8 text-[#F27781]" />
-              <div className="text-right">
-                <div className="font-extrabold text-[#222222]">Profile</div>
-                <div className="text-xs text-gray-500">Driver</div>
+            <Link to="/driver-profile" className="flex items-center space-x-3 group">
+              <div className="relative">
+                <UserCircleIcon className="h-9 w-9 text-indigo-600 group-hover:text-indigo-800 transition-colors" />
+                <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-green-500 ring-2 ring-white"></span>
+              </div>
+              <div className="text-right hidden md:block">
+                <div className="font-medium text-gray-900">Driver Profile</div>
+                <div className="text-xs text-gray-500">Premium Member</div>
               </div>
             </Link>
           </div>
         </header>
 
         {/* Content */}
-        <main className="p-6 space-y-6 overflow-auto">
-          {/* Stats */}
+        <main className="flex-1 p-6 space-y-6 overflow-auto bg-gray-50">
+          {/* Welcome Header */}
+          <div className="bg-gradient-to-r from-indigo-600 to-purple-600  rounded-xl shadow-lg p-6 text-white">
+            <h1 className="text-2xl font-bold mb-2">Welcome back!</h1>
+            <p className="opacity-90">You have {activeTrip ? 'an active trip' : 'no current trips'}. {activeTrip ? 'Safe driving!' : 'Check for available bookings below.'}</p>
+          </div>
+
+          {/* Stats - Cards with better design */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { label: 'Total trips', value: totalTrips, meta: '+2.1% this month' },
-              { label: 'Distance driven', value: `${distanceDriven} km` },
-              { label: 'Driving hours', value: `${drivingHours} hr`, meta: '+1.5 hr this week' },
-              { label: 'Rating', value: '4.8 ★', meta: 'Based on 68 reviews' },
-            ].map(({ label, value, meta }) => (
-              <div key={label} className="bg-white p-4 rounded-xl shadow border border-[#F27781]">
-                <div className="text-sm font-extrabold text-[#222222]">{label}</div>
-                <div className="text-3xl font-extrabold text-[#F27781]">{value}</div>
-                {meta && <div className="text-xs text-gray-500 mt-1">{meta}</div>}
+              { label: 'Total trips', value: totalTrips, meta: '+2.1% this month', icon: ClipboardListIcon, color: 'bg-indigo-100 text-indigo-600' },
+              { label: 'Distance driven', value: `${distanceDriven} km`, icon: MapIcon, color: 'bg-purple-100 text-purple-600' },
+              { label: 'Driving hours', value: `${drivingHours} hr`, meta: '+1.5 hr this week', icon: ClockIcon, color: 'bg-blue-100 text-blue-600' },
+              { label: 'Rating', value: '4.8 ★', meta: 'Based on 68 reviews', icon: TruckIcon, color: 'bg-green-100 text-green-600' },
+            ].map(({ label, value, meta, icon: Icon, color }) => (
+              <div key={label} className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">{label}</p>
+                    <p className="text-2xl font-bold mt-1 text-gray-900">{value}</p>
+                    {meta && <p className="text-xs text-gray-500 mt-1">{meta}</p>}
+                  </div>
+                  <div className={`p-3 rounded-lg ${color}`}>
+                    <Icon className="h-6 w-6" />
+                  </div>
+                </div>
               </div>
             ))}
           </div>
 
           {/* Conditional Trip Display */}
           {activeTrip ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              <CurrentTrip
-                activeTrip={activeTrip}
-                progress={progress}
-                remainingTime={remainingTime}
-                handleComplete={handleComplete}
-              />
-              <div className="bg-white p-4 rounded-xl shadow border border-[#F27781]">
-                <MapComponent activeTrip={activeTrip} />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 space-y-6">
+                <CurrentTrip
+                  activeTrip={activeTrip}
+                  progress={progress}
+                  remainingTime={remainingTime}
+                  handleComplete={handleComplete}
+                />
+              </div>
+              <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 h-full">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">Live Location</h3>
+                <div className="rounded-lg overflow-hidden h-96">
+                  <MapComponent activeTrip={activeTrip} />
+                </div>
               </div>
             </div>
           ) : (
