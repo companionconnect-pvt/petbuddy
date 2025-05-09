@@ -24,7 +24,6 @@
     "mongoose": "^8.14.0",
     "multer": "^1.4.5-lts.2",
     "multer-storage-cloudinary": "^4.0.0",
-    "node-cache": "^5.1.2",
     "nodemon": "^3.1.10",
     "opencage-api-client": "^1.1.0",
     "sib-api-v3-sdk": "^8.5.0",

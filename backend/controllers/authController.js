@@ -3,46 +3,6 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { userSignup, sendNewUserMail } = require("../utils/emailNotification");
 const { getCoordinates } = require("../utils/coordinates");
-// const { clearUserCache } = require('../server');
-const NodeCache = require('node-cache')
-const myCache = new NodeCache()
-
-const clearUserCache = (userId) => {
-    if (!userId) {
-        console.warn("[Cache Management] clearUserCache called without a userId.");
-        return;
-    }
-    console.log(`[Cache Management] Clearing cache for user: ${userId}`);
-    const keys = myCache.keys();
-    const userKeys = keys.filter(key => key.startsWith(`cache::${userId}::`));
-
-    if (userKeys.length > 0) {
-        const deleteCount = myCache.del(userKeys);
-        console.log(`[Cache Management] Cleared ${deleteCount} cache entries for user: ${userId}`);
-    } else {
-        console.log(`[Cache Management] No cache entries found for user: ${userId}`);
-    }
-};
-
-
-exports.logout = async (req, res) => {
-  console.log("Signout request backend");
-  try {
-    const userId = req.user.id;
-    console.log(userId);
-    if (userId) {
-    clearUserCache(userId);
-    console.log(`Cache clear requested and executed for user: ${req.user.id}`);
-    res.status(200).json({ message: "User cache cleared successfully" });
-    } else {
-      console.warn("Cache clear requested but user ID not found on request.");
-     res.status(400).json({ message: "Unable to identify user for cache clearing" });
-    }
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-}
 
 exports.signup = async (req, res) => {
   const {

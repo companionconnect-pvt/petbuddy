@@ -77,34 +77,7 @@ const PethouseProfile = () => {
     setEditingField(null);
     setEditValue("");
   };
-  const handleLogout = async () => {
-    const token = localStorage.getItem("token"); // Get token once
-    console.log("Token before signout:", token); // Log the token you are sending
 
-    try {
-        // Correct way to send headers with a POST request (assuming Axios or similar)
-        // The second argument is the request body (null if no body needed for logout)
-        // The third argument is the config object, where headers go
-        const res = await API.post("/petclinic/logout", null, {
-             headers: {
-                 Authorization: `Bearer ${token}`
-             }
-         });
-
-        console.log("Backend response:", res.data); // Log the response data
-
-    } catch (error) {
-        console.error("Signout failed:", error.response ? error.response.data : error.message);
-        // Handle errors, maybe show a message to the user
-    } finally {
-        // Always remove token and update state regardless of backend success/failure for a client-side "logout"
-        localStorage.removeItem("token");
-                
-        console.log("Token removed from localStorage");
-        navigate("/login");
-      }
-
-  }
   const handleSaveClick = async () => {
     if (isSaving) return;
     setIsSaving(true);
@@ -347,7 +320,8 @@ const PethouseProfile = () => {
 
             <button
               onClick={() => {
-                handleLogout();
+                localStorage.removeItem("token");
+                navigate("/login"); // Or your specific pethouse login route
               }}
               className="w-full px-4 py-3 text-red-600 border border-red-500 rounded-lg hover:bg-red-500 hover:text-white transition duration-300 font-medium text-sm shadow-sm"
             >
