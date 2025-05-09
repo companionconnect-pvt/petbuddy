@@ -75,6 +75,7 @@ const Routing = ({ current, source, destination }) => {
 };
 
 const MapComponent = ({ activeTrip }) => {
+  console.log(activeTrip);
   const [currentPosition, setCurrentPosition] = useState(null);
   const [locationAccuracy, setLocationAccuracy] = useState(null);
 
@@ -82,6 +83,7 @@ const MapComponent = ({ activeTrip }) => {
     const watchId = navigator.geolocation.watchPosition(
       (position) => {
         const newPosition = {
+          bookingId : activeTrip.id,
           lat: position.coords.latitude,
           lng: position.coords.longitude,
         };

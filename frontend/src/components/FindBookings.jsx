@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FiClock, FiMapPin, FiUser, FiCalendar, FiCheck } from 'react-icons/fi';
 
 const FindBookings = ({ handleAcceptBooking }) => {
+  
   const [availableBookings, setAvailableBookings] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -17,6 +18,7 @@ const FindBookings = ({ handleAcceptBooking }) => {
             Authorization: `Bearer ${token}`,
           },
         });
+        console.log(res.data);
         setAvailableBookings(res.data);
       } catch (error) {
         console.error("Error fetching bookings:", error);

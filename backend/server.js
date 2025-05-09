@@ -23,7 +23,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "*", // Update to restrict in production
+    origin: "*", // Set to specific frontend URL in production
     methods: ["GET", "POST"],
   },
 });
@@ -58,10 +58,11 @@ mongoose
     process.exit(1);
   });
 
-// Socket.IO Chat Logic
+// Socket.IO Logic
 io.on("connection", (socket) => {
   console.log("✅ A user connected");
 
+  // Chat: Join a ticket room
   socket.on("joinRoom", (ticketId) => {
     socket.join(ticketId);
   });
@@ -74,15 +75,27 @@ io.on("connection", (socket) => {
       encryptedMessage,
       timestamp: new Date(),
     };
-
-    // Broadcast to all users in the ticket room
     io.to(ticketId).emit("receiveMessage", chatMessage);
   });
-  socket.on("locationUpdate", (location) => {
-    console.log("📍 Location update received:", location);
 
-    // Broadcast location to all other clients (except sender)
-    socket.broadcast.emit("driverLocation", location);
+  // Location: Join booking room
+  socket.on("joinBookingRoom", (bookingId) => {
+    socket.join(bookingId);
+    console.log(`📦 Joined booking room: ${bookingId}`);
+  });
+
+  // Location: Broadcast driver's location only to users in the booking room
+  socket.on("locationUpdate", ({ bookingId, lat, lng }) => {
+    if (bookingId && lat && lng) {
+      console.log(`📍 Location update for booking ${bookingId}:`, lat, lng);
+      io.to(bookingId).emit("locationUpdate", { bookingId, lat, lng });
+    }
+  });
+
+  // Leave room (optional cleanup)
+  socket.on("leaveRoom", (roomId) => {
+    socket.leave(roomId);
+    console.log(`🚪 Left room: ${roomId}`);
   });
 
   socket.on("disconnect", () => {
@@ -90,5 +103,5 @@ io.on("connection", (socket) => {
   });
 });
 
-// Socket.IO: Video Call
+// Socket.IO: Video Call Logic
 setupVideoCall(io);

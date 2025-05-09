@@ -24,6 +24,8 @@ import PethouseProfile from "./components/Pethouse/PethouseProfile";
 import PetClinicDashboard from "./components/PetClinic/PetClinicDashboard";
 import PetClinicLogin from "./components/PetClinic/PetClinicLogin";
 
+import UserLiveMap from "./components/UserLiveMap";
+
 function App() {
   return (
     <Router>
@@ -57,7 +59,7 @@ function App() {
           <Route path="/edituserprofile" element={<EditUserProfile />} />
           <Route path="/editpet/:petId" element={<EditPet />} />
           <Route path="/userDashboard" element={<UserDashboard />} />
-          
+          <Route path="/map/:bookingId" element={<UserLiveMap />} />
           
         </Route>
 

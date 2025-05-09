@@ -4,6 +4,7 @@ import API from "../api";
 import editIcon from "../assets/pencil-svgrepo-com.svg";
 import binIcon from "../assets/trash-bin-trash-svgrepo-com.svg";
 import { motion, AnimatePresence } from "framer-motion";
+import { FaCar, FaMapMarkerAlt, FaUserClock } from "react-icons/fa";
 import {
   FiUser,
   FiMail,
@@ -29,11 +30,17 @@ const UserProfile = () => {
   const [selectedConsultation, setSelectedConsultation] = useState(null);
   const [showConsultationCard, setShowConsultationCard] = useState(false);
   const [petClinics, setPetClinics] = useState(null);
+  const [liveBookings, setLiveBookings] = useState([]);
+
   const navigate = useNavigate();
 
   const handleButtonClick = () => {
     // replace with the actual room ID
     navigate(`/video-call/${bookingID}`);
+  };
+  const handleMap = () => {
+    // replace with the actual room ID
+    navigate(`/map/${bookingID}`);
   };
   const handleButtonClickChat = () => {
     // replace with the actual room ID
@@ -44,6 +51,15 @@ const UserProfile = () => {
     fetchProfile();
     fetchPetClinics();
   }, []);
+
+  useEffect(() => {
+  if (user && user.consultations) {
+    const filtered = user.consultations.filter(
+      (consultation) => consultation.isDriverAssigned
+    );
+    setLiveBookings(filtered);
+  }
+}, [user]);
 
   const fetchPetClinics = async () => {
     setIsLoading(true);
@@ -454,6 +470,7 @@ const UserProfile = () => {
                 >
                   Video Call
                 </button>
+                
                 <button
                   onClick={() => {
                     // Add cancel functionality here
@@ -969,6 +986,119 @@ const UserProfile = () => {
         </motion.div>
 
         <PethouseBookingCard></PethouseBookingCard>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="bg-white rounded-2xl p-8 shadow-xs border border-gray-100"
+        >
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <h3 className="text-2xl font-bold text-gray-900">Track Live Bookings</h3>
+              <p className="text-gray-500">Real-time tracking of your active transports</p>
+            </div>
+            <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
+              <FaCar size={20} />
+            </div>
+          </div>
+
+          {liveBookings.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                <FaUserClock className="text-gray-400" size={32} />
+              </div>
+              <h4 className="text-lg font-medium text-gray-700 mb-2">
+                No active transports
+              </h4>
+              <p className="text-gray-500 mb-6">
+                Your upcoming transports will appear here when a driver is assigned
+              </p>
+            </div>
+          ) : (
+            <ul className="space-y-4">
+              {liveBookings.map((booking) => {
+                const pet = user.pets.find((p) => p._id === booking.petId);
+                const clinic = petClinics.find((p) => p._id === booking.petClinicId);
+                
+                return (
+                  <motion.li
+                    key={`live-${booking._id}`}
+                    whileHover={{ scale: 1.01 }}
+                    className="border border-gray-200 rounded-xl p-5 hover:shadow-xs transition-all duration-300"
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="text-lg font-semibold text-gray-900">
+                          Transport for {pet?.name || 'your pet'}
+                        </p>
+                        <div className="flex items-center space-x-4 mt-2">
+                          <div className="flex items-center text-sm text-gray-500">
+                            <FaMapMarkerAlt className="mr-1" size={14} />
+                            <span>To {clinic?.name || 'clinic'}</span>
+                          </div>
+                          <div className="flex items-center text-sm text-gray-500">
+                            <FiCalendar className="mr-1" size={14} />
+                            <span>
+                              {new Date(booking.appointmentDate).toLocaleDateString(
+                                "en-US",
+                                {
+                                  month: "short",
+                                  day: "numeric",
+                                  year: "numeric",
+                                }
+                              )}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                        Driver Assigned
+                      </span>
+                    </div>
+
+                    <div className="mt-4 grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm text-gray-500">Pickup Location</p>
+                        <p className="font-medium">
+                          {booking.source?.address?.street || 'Your address'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500">Destination</p>
+                        <p className="font-medium">
+                          {booking.destination?.address?.street || 'Clinic address'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="mt-6 flex space-x-3">
+                      <button
+                        onClick={() => {
+                          // Implement tracking functionality
+                          navigate(`/tracking/${booking._id}`);
+                        }}
+                        className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center space-x-2"
+                      >
+                        <FaMapMarkerAlt />
+                        <span>Track Ride</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSelectedConsultation(booking);
+                          setShowConsultationCard(true);
+                        }}
+                        className="flex-1 px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+                      >
+                        View Details
+                      </button>
+                    </div>
+                  </motion.li>
+                );
+              })}
+            </ul>
+          )}
+        </motion.div>
+
       </div>
 
       <AnimatePresence>

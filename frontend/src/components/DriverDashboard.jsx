@@ -19,55 +19,51 @@ const DriverDashboard = () => {
   const [drivingHours, setDrivingHours] = useState(16.2); // hours
   const navigate = useNavigate();
 
-  const dummyBookings = [
-    {
-      id: '1',
-      bookerName: 'Saumya Sharma',
-      source: { lat: 28.5708, lng: 77.3261 },
-      destination: { lat: 28.6315, lng: 77.2167 },
-      from: 'Noida Sector 18',
-      to: 'Connaught Place, Delhi',
-      startTime: '10:00 AM',
-      endTime: '11:00 AM',
-    },
-    {
-      id: '2',
-      bookerName: 'Ayush Talan',
-      source: { lat: 28.5734, lng: 77.0125 },
-      destination: { lat: 28.4941, lng: 77.0888 },
-      from: 'Noida Sector 63',
-      to: 'Hauz Khas, Delhi',
-      startTime: '10:00 AM',
-      endTime: '11:00 AM',
-    },
-  ];
+  function getRandomLat() {
+  return (Math.random() * 180 - 90).toFixed(6); // -90 to 90
+}
 
-  const [availableBookings, setAvailableBookings] = useState(dummyBookings);
+function getRandomLng() {
+  return (Math.random() * 360 - 180).toFixed(6); // -180 to 180
+}
+
+  const [availableBookings, setAvailableBookings] = useState("");
 
   const handleAcceptBooking = (booking) => {
     localStorage.setItem('currentBooking', JSON.stringify(booking));
+  
+    const sourceCoordinates = booking.source.latitude != null && booking.source.longitude != null
+      ? { lat: booking.source.latitude, lng: booking.source.longitude }
+      :{lat:24.9,lng:74.8};
+  
+    const destCoordinates = booking.destination.latitude != null && booking.destination.longitude != null
+      ? { lat: booking.destination.latitude, lng: booking.destination.longitude }
+      : {lat:24.8, lng:74.9};
+  
     setActiveTrip({
-      id: booking.id,
+      id: booking._id,
       bookerName: booking.bookerName,
       status: 'active',
-      sourceCoordinates: booking.source,
-      destCoordinates: booking.destination,
+      sourceCoordinates,
+      destCoordinates,
       startTime: booking.startTime,
       endTime: booking.endTime,
       from: booking.from,
       to: booking.to,
     });
+   
   };
 
   useEffect(() => {
     const trip = activeTrips.find((trip) => trip.status === 'active');
     if (trip) {
+
       setActiveTrip({
         ...trip,
         startTime: '10:00 AM',
         endTime: '12:00 PM',
-        sourceCoordinates: { lat: 28.6, lng: 77.2 },
-        destCoordinates: { lat: 28.5, lng: 77.4 },
+        sourceCoordinates: { latitude: 28.6, longitude: 77.2 },
+        destCoordinates: { latitude: 28.5, longitude: 77.4 },
       });
     }
 
