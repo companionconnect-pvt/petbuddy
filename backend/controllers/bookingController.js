@@ -68,9 +68,9 @@ exports.getAllBookings = async (req, res) => {
       role === "pethouse" ? { petHouseId: userId } : { userId: userId };
 
     const bookings = await Booking.find(filter)
-      .populate("userId", "name email")
+      .populate("userId", "name email phoneNumber")
       .populate("petHouseId", "name email")
-      .populate("petId", "name type breed");
+      .populate("petId", "name type breed species age");
 
     res.status(200).json(bookings);
   } catch (err) {

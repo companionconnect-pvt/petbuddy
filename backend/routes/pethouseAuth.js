@@ -25,6 +25,6 @@ router.get("/all", verifyToken, getAllPetHouses);
 router.get("/profile", verifyToken, getPetHouseProfile);
 router.patch("/update", verifyToken, updateProfile);
 router.get("/", getAllPetHouses);
-router.put("/profile", updatePetHouseProfile);
+router.put("/profile", verifyToken, updatePetHouseProfile);
 
 module.exports = router;
