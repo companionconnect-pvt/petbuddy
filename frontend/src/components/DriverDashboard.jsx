@@ -6,6 +6,8 @@ import MapComponent from './MapComponent';
 import FindBookings from './FindBookings';
 import activeTrips from './data/activeTripData.js';
 import CurrentTrip from './CurrentTrip';
+import { jwtDecode } from "jwt-decode";
+import API from '../api.js';
 
 const DriverDashboard = () => {
   const [currentTrips, setCurrentTrips] = useState([]);
@@ -14,9 +16,9 @@ const DriverDashboard = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [progress, setProgress] = useState(0);
   const [remainingTime, setRemainingTime] = useState(120);
-  const [totalTrips, setTotalTrips] = useState(84);
-  const [distanceDriven, setDistanceDriven] = useState(1628); // in km
-  const [drivingHours, setDrivingHours] = useState(16.2); // hours
+  const [totalTrips, setTotalTrips] = useState(0);
+  const [distanceDriven, setDistanceDriven] = useState(0); // in km
+  const [drivingHours, setDrivingHours] = useState(0); // hours
   const navigate = useNavigate();
 
   function getRandomLat() {
@@ -28,30 +30,49 @@ const DriverDashboard = () => {
   }
 
   const [availableBookings, setAvailableBookings] = useState("");
+const handleAcceptBooking = async (booking) => {
+  localStorage.setItem('currentBooking', JSON.stringify(booking));
 
-  const handleAcceptBooking = (booking) => {
-    localStorage.setItem('currentBooking', JSON.stringify(booking));
-  
-    const sourceCoordinates = booking.source.latitude != null && booking.source.longitude != null
-      ? { lat: booking.source.latitude, lng: booking.source.longitude }
-      :{lat:24.9,lng:74.8};
-  
-    const destCoordinates = booking.destination.latitude != null && booking.destination.longitude != null
-      ? { lat: booking.destination.latitude, lng: booking.destination.longitude }
-      : {lat:24.8, lng:74.9};
-  
-    setActiveTrip({
-      id: booking._id,
-      bookerName: booking.bookerName,
-      status: 'active',
-      sourceCoordinates,
-      destCoordinates,
-      startTime: booking.startTime,
-      endTime: booking.endTime,
-      from: booking.source?.address?.city || "N/A",
-      to: booking.destination?.address?.city || "N/A",
-    });
-  };
+  const token = localStorage.getItem('token');
+  const decodedToken = jwtDecode(token);
+
+  const sourceCoordinates = booking.source.latitude != null && booking.source.longitude != null
+    ? { lat: booking.source.latitude, lng: booking.source.longitude }
+    : { lat: 24.9, lng: 74.8 };
+
+  const destCoordinates = booking.destination.latitude != null && booking.destination.longitude != null
+    ? { lat: booking.destination.latitude, lng: booking.destination.longitude }
+    : { lat: 24.8, lng: 74.9 };
+
+  setActiveTrip({
+    id: booking._id,
+    bookerName: booking.bookerName,
+    status: 'active',
+    sourceCoordinates,
+    destCoordinates,
+    startTime: booking.startTime,
+    endTime: booking.endTime,
+    from: booking.source?.address?.city || "N/A",
+    to: booking.destination?.address?.city || "N/A",
+  });
+  console.log("frontend");
+  try {
+    const response = await API.put(
+      `/consultation/${booking._id}/assign-driver`,
+      { isDriverAssigned: true },
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      }
+    );
+
+    console.log("Consultation updated with driver:", response.data);
+  } catch (error) {
+    console.error("Error assigning driver to consultation:", error);
+  }
+};
+
 
   useEffect(() => {
     const trip = activeTrips.find((trip) => trip.status === 'active');

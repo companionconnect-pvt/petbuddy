@@ -219,4 +219,34 @@ const deleteConsultation = async(req, res) => {
     res.status(500).json({ message: "Server error." });
   }
 }
-module.exports = { getConsultation,createConsultation, getClinicConsultations, updateConsultationStatus, getConsultationStats, getConfirmedBookingsWithoutDriver, deleteConsultation};
+const assignDriverToConsultation = async (req, res) => {
+  console.log("assign driver");
+  try {
+  
+    const consultationId = req.params.id;
+    const driverId = req.user.id; // comes from verifyToken middleware
+    const { isDriverAssigned } = req.body;
+
+    const updatedConsultation = await Consultation.findByIdAndUpdate(
+      consultationId,
+      {
+        driver: driverId,
+        isDriverAssigned: isDriverAssigned || true,
+      },
+      { new: true }
+    );
+
+    if (!updatedConsultation) {
+      return res.status(404).json({ message: "Consultation not found" });
+    }
+
+    res.status(200).json(updatedConsultation);
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+
+
+
+module.exports = { assignDriverToConsultation, getConsultation,createConsultation, getClinicConsultations, updateConsultationStatus, getConsultationStats, getConfirmedBookingsWithoutDriver, deleteConsultation};
