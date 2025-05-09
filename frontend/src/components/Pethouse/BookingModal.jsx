@@ -112,8 +112,6 @@ const BookingModal = ({
 
   const handleCompleteClick = async () => {
     setLoadingAction("complete");
-    // In a real app, you might show a form here first to collect notes/treatment
-    // For this example, we'll just send a simple patch request.
     const completionNotes = prompt("Enter completion notes (optional):"); // Simple prompt for input
 
     try {
@@ -122,8 +120,8 @@ const BookingModal = ({
         return;
       }
       // Assuming this endpoint marks a booking as completed
-      await API.patch(
-        `/pethouse/booking/${booking._id}/complete`,
+      await API.put(
+        `/booking/complete/${booking._id}`,
         { notes: completionNotes || "No notes provided." }, // Include notes from prompt
         {
           headers: { Authorization: `Bearer ${token}` },

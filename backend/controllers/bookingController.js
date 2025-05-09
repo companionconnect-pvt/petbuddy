@@ -153,6 +153,60 @@ exports.getConfirmedBookingsWithoutDriver = async (req, res) => {
   }
 };
 
+exports.markBookingCompleted = async (req, res) => {
+  console.log(
+    "Attempting to mark booking as completed with ID:",
+    req.params.id
+  );
+  try {
+    const role = req.user.role;
+    const userId = req.user.id; // ID of the authenticated user (PetHouse)
+    const bookingId = req.params.id;
+    const { notes, treatment } = req.body; // Get completion details from body
+
+    // Ensure only PetHouses can mark bookings as completed
+    if (role !== "pethouse") {
+      return res
+        .status(403)
+        .json({ message: "Only PetHouses can mark bookings as completed" });
+    }
+
+    const booking = await Booking.findOne({
+      _id: bookingId,
+    });
+
+    // Check if the booking exists
+    if (!booking) {
+      return res
+        .status(404)
+        .json({ message: "Booking not found or not authorized to update" });
+    }
+
+    if (booking.status !== "confirmed") {
+      return res.status(400).json({
+        message: `Booking cannot be marked as completed in status: ${booking.status}`,
+      });
+    }
+
+    booking.status = "completed";
+    if (notes !== undefined) {
+      booking.notes = notes;
+    }
+    if (treatment !== undefined) {
+      booking.treatment = treatment;
+    }
+
+    await booking.save();
+
+    res.status(200).json({ message: "Booking marked as completed", booking });
+  } catch (err) {
+    console.error("Error marking booking as completed:", err);
+    res
+      .status(500)
+      .json({ message: "Server error while marking booking as completed" });
+  }
+};
+
 exports.deleteUsingId = async (req, res) => {
   console.log("Deleting booking with ID:", req.params.id);
   try {
