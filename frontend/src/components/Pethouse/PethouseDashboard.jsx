@@ -400,9 +400,14 @@ const PethouseDashboard = () => {
                       <p className="text-sm text-gray-600 mb-1">
                         <span className="font-medium">Pet:</span>{" "}
                         {/* Assuming petType is directly on booking or service */}
-                        {booking.petId?.species ||
+                        {booking.petId?.name ||
                           booking.service?.petType ||
                           "N/A"}
+                        (
+                        {booking.petId?.breed ||
+                          booking.service?.petType ||
+                          "N/A"}
+                        )
                       </p>
                       <p className="text-sm text-gray-600 mb-1">
                         <span className="font-medium">Amount:</span> ₹
