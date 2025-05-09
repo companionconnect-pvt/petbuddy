@@ -836,7 +836,7 @@ const UserProfile = () => {
             </button>
           </div>
 
-          {user.bookings.length === 0 && user.consultations.length === 0 ? (
+          {user.consultations.length === 0 ? (
             <div className="text-center py-12">
               <div className="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                 <FiCalendar className="text-gray-400" size={32} />
@@ -856,69 +856,7 @@ const UserProfile = () => {
             </div>
           ) : (
             <ul className="space-y-4">
-              {user.bookings.map((booking) => (
-                <motion.li
-                  key={`booking-${booking._id}`}
-                  whileHover={{ scale: 1.01 }}
-                  className="border border-gray-200 rounded-xl p-5 hover:shadow-xs transition-all duration-300"
-                >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p
-                        className={`text-lg font-semibold text-gray-900 capitalize`}
-                      >
-                        {booking.serviceType.name}
-                      </p>
-                      <div className="flex items-center space-x-4 mt-2">
-                        <div className="flex items-center text-sm text-gray-500">
-                          <FiCalendar className="mr-1" size={14} />
-                          <span>
-                            {new Date(booking.startDate).toLocaleDateString(
-                              "en-US",
-                              {
-                                month: "short",
-                                day: "numeric",
-                                year: "numeric",
-                              }
-                            )}
-                          </span>
-                        </div>
-                        {booking.petId && (
-                          <div className="flex items-center text-sm text-gray-500">
-                            <span className="bg-gray-100 px-2 py-1 rounded-full">
-                              {booking.status}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        booking.status === "confirmed"
-                          ? "bg-green-100 text-green-800"
-                          : booking.status === "pending"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : booking.status === "cancelled"
-                          ? "bg-red-100 text-red-800"
-                          : "bg-gray-100 text-gray-800"
-                      }`}
-                    >
-                      {booking.status}
-                    </span>
-                  </div>
-                  <div className="mt-4 flex justify-between items-center">
-                    <div>
-                      <p className="text-sm text-gray-500">Professional</p>
-                      <p className="font-medium">
-                        Dr. {booking.serviceType?.petType || "Not assigned"}
-                      </p>
-                    </div>
-                    <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
-                      View Details
-                    </button>
-                  </div>
-                </motion.li>
-              ))}
+              
               {user.consultations.map((consultation) => {
                 const petName = user.pets.find(
                   (p) => p._id === consultation.petId

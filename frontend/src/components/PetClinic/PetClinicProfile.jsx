@@ -146,9 +146,7 @@ const PetClinicProfile = () => {
     <motion.div
       key={fieldName}
       className="bg-white rounded-xl p-5 shadow-sm border border-gray-200"
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
+      
     >
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center">
@@ -310,12 +308,12 @@ const PetClinicProfile = () => {
             </div>
 
             <div className="w-full mb-4">
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">Specialization</h3>
+              <h3 className="text-center text-lg font-semibold text-gray-700 mb-2">Specialization</h3>
               <p className="text-center text-gray-600">{specialization}</p>
             </div>
 
             <div className="w-full mb-4">
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">Experience</h3>
+              <h3 className="text-center text-lg font-semibold text-gray-700 mb-2">Experience</h3>
               <p className="text-center text-gray-600">{experience} years</p>
             </div>
 
