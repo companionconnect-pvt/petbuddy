@@ -12,6 +12,7 @@ import {
   FiChevronDown,
   FiChevronUp,
 } from "react-icons/fi";
+import { FiUser as FiProfile } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import { RiShieldUserLine } from "react-icons/ri";
 
@@ -638,12 +639,20 @@ const PetClinicDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Clinic Dashboard</h1>
-          <p className="text-gray-600">
-            Manage all your clinic consultations in one place
-          </p>
-        </div>
+      <div className="mb-8 flex justify-between items-start">
+  <div>
+    <h1 className="text-3xl font-bold text-gray-900">Clinic Dashboard</h1>
+    <p className="text-gray-600">
+      Manage all your clinic consultations in one place
+    </p>
+  </div>
+  <button
+    onClick={() => navigate("/petclinic/profile")}
+    className="text-[#F27781] font-semibold border border-[#F27781] px-4 py-2 rounded-lg hover:bg-[#F27781] hover:text-white transition"
+  >
+    <span>Profile</span>
+  </button>
+</div>
 
         <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
           <div className="flex flex-col md:flex-row gap-4">

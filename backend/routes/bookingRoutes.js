@@ -8,6 +8,7 @@ const {
   getConfirmedBookingsWithoutDriver,
   rescheduleAppointment,
   deleteUsingId,
+  markBookingCompleted,
 } = require("../controllers/bookingController");
 
 const verifyToken = require("../middlewares/auth");
@@ -30,6 +31,7 @@ router.get("/:id", verifyToken, getBookingById);
 // Update booking status (only allowed by pet house)
 router.patch("/:id/status", verifyToken, updateBookingStatus);
 
+router.put("/complete/:id", verifyToken, markBookingCompleted);
 router.put("/:id/reschedule", verifyToken, rescheduleAppointment);
 router.delete("/:id", verifyToken, deleteUsingId);
 

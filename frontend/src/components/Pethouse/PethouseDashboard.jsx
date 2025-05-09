@@ -5,22 +5,27 @@ import {
   HomeIcon,
   CalendarIcon,
   StarIcon,
-  ClockIcon, // For stats
-  CheckCircleIcon, // For stats
-  XCircleIcon, // For stats
-  CollectionIcon, // Example, choose appropriate icons
-} from "@heroicons/react/outline"; // Outline icons for sidebar and stats
+  ClockIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+  CollectionIcon,
+} from "@heroicons/react/outline";
 import {
-  UserCircleIcon as UserCircleSolidIcon, // Solid for topbar
-  BellIcon as BellSolidIcon, // Solid for topbar
+  UserCircleIcon as UserCircleSolidIcon,
+  BellIcon as BellSolidIcon,
 } from "@heroicons/react/solid";
-import API from "../../api";
+import API from "../../api"; // Assuming your API instance is here
+import BookingModal from "./BookingModal"; // Import the BookingModal component
 
 const PethouseDashboard = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
+
+  // State for Modal
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Placeholder for new bookings today or other dynamic meta data for stats
   const [newBookingsToday, setNewBookingsToday] = useState(5); // Example value
@@ -33,6 +38,7 @@ const PethouseDashboard = () => {
         navigate("/pethouse/login");
         return;
       }
+      // Assuming /booking/all is the correct endpoint for pethouse bookings
       const res = await API.get("/booking/all", {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -43,12 +49,14 @@ const PethouseDashboard = () => {
         (b) => b.status === "confirmed"
       ).length;
       const totalNonCancelled = res.data.filter(
-        (b) => b.status !== "cancelled"
+        (b) => b.status !== "cancelled" && b.status !== "rejected" // Include 'rejected' in non-cancelled total
       ).length;
       if (totalNonCancelled > 0) {
         setAcceptanceRate(
           Math.round((confirmedCount / totalNonCancelled) * 100)
         );
+      } else {
+        setAcceptanceRate(0); // Handle division by zero
       }
     } catch (err) {
       console.error("Failed to load bookings:", err);
@@ -61,53 +69,109 @@ const PethouseDashboard = () => {
   useEffect(() => {
     fetchBookings();
     // You might want to fetch newBookingsToday from an API or calculate it
-  }, [token, navigate]);
+  }, [token, navigate]); // Dependencies added
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/pethouse/login");
   };
 
-  const handleAccept = async (id) => {
+  // Handlers for actions from the modal/card
+  const handleAcceptBooking = async (booking) => {
+    // Accept booking object
     try {
       await API.patch(
-        `/pethouse/booking/${id}/accept`,
+        `/pethouse/booking/${booking._id}/accept`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
+      alert("Booking accepted!"); // User feedback
+      handleCloseModal(); // Close modal after action
       fetchBookings(); // Re-fetch to update list
-    } catch {
-      alert("Failed to accept booking");
+    } catch (err) {
+      console.error("Failed to accept booking:", err);
+      alert("Failed to accept booking.");
     }
   };
 
-  const handleReject = async (id) => {
+  const handleRejectBooking = async (booking) => {
+    // Accept booking object
     try {
+      // Assuming /pethouse/booking/{id}/cancel is used for rejecting
       await API.patch(
-        `/pethouse/booking/${id}/cancel`, // Assuming this endpoint cancels/rejects
+        `/pethouse/booking/${booking._id}/cancel`, // Use booking._id
         {},
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
+      alert("Booking rejected!"); // User feedback
+      handleCloseModal(); // Close modal after action
       fetchBookings(); // Re-fetch to update list
-    } catch {
-      alert("Failed to reject booking");
+    } catch (err) {
+      console.error("Failed to reject booking:", err);
+      alert("Failed to reject booking.");
     }
+  };
+
+  const handleCompleteBooking = async (booking) => {
+    // Accept booking object
+    // In a real application, this would likely open a form within the modal
+    // or a new modal to enter completion details (notes, treatment, etc.).
+    // For this example, we'll just log and call a placeholder API endpoint.
+    console.log("Attempting to mark booking as completed:", booking);
+
+    try {
+      // Example API call to mark as completed (adjust endpoint/payload as needed)
+      await API.patch(
+        `/pethouse/booking/${booking._id}/complete`,
+        { notes: "Completed as per schedule." }, // Example payload
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert("Booking marked as completed!"); // User feedback
+      handleCloseModal(); // Close modal after action
+      fetchBookings(); // Re-fetch
+    } catch (err) {
+      console.error("Failed to complete booking:", err);
+      alert("Failed to mark booking as completed.");
+    }
+  };
+
+  const handleRescheduleBooking = (booking) => {
+    // Accept booking object
+    console.log("Initiating reschedule for booking:", booking);
+    alert(`Reschedule functionality for booking ${booking._id} would go here.`);
+    // This would typically involve navigating to a new page or opening a complex form/modal.
+    // You might close the current modal depending on the rescheduling flow.
+    // handleCloseModal();
+  };
+
+  // Handler to open the modal
+  const handleBookingClick = (booking) => {
+    setSelectedBooking(booking);
+    setIsModalOpen(true);
+  };
+
+  // Handler to close the modal
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedBooking(null); // Clear selected booking when closing
   };
 
   const total = bookings.length;
   const confirmed = bookings.filter((b) => b.status === "confirmed").length;
   const pending = bookings.filter((b) => b.status === "pending").length;
-  const cancelled = bookings.filter((b) => b.status === "cancelled").length;
+  const cancelled = bookings.filter((b) => b.status === "cancelled").length; // Keeping cancelled count
+  const rejected = bookings.filter((b) => b.status === "rejected").length; // Added rejected count
+  const completed = bookings.filter((b) => b.status === "completed").length; // Added completed count
 
   const sidebarNavItems = [
-    ["Dashboard", ClipboardListIcon, "/pethouse/dashboard"], // Added path for Link
-    ["Bookings", CalendarIcon, "/pethouse/dashboard"],
-    ["Services", HomeIcon, "/pethouse/dashboard"],
-    ["Reviews", StarIcon, "/pethouse/dashboard"],
+    ["Dashboard", ClipboardListIcon, "/pethouse/dashboard"],
+    ["Bookings", CalendarIcon, "/pethouse/dashboard"], // Link to the same page for now
+    ["Services", HomeIcon, "/pethouse/services"], // Example path
+    ["Reviews", StarIcon, "/pethouse/reviews"], // Example path
   ];
 
   const statsData = [
@@ -119,7 +183,7 @@ const PethouseDashboard = () => {
       meta: `+${newBookingsToday} today`,
     },
     {
-      label: "Accepted",
+      label: "Confirmed", // Changed from Accepted for clarity
       value: confirmed,
       icon: CheckCircleIcon,
       color: "bg-green-100 text-green-600",
@@ -133,8 +197,15 @@ const PethouseDashboard = () => {
       meta: `${pending} awaiting action`,
     },
     {
-      label: "Cancelled",
-      value: cancelled,
+      label: "Completed", // Added Completed stat
+      value: completed,
+      icon: CheckCircleIcon, // Or another appropriate icon
+      color: "bg-blue-100 text-blue-600",
+      meta: "",
+    },
+    {
+      label: "Cancelled/Rejected", // Combined stat
+      value: cancelled + rejected,
       icon: XCircleIcon,
       color: "bg-gray-100 text-gray-600",
       meta: "",
@@ -143,7 +214,7 @@ const PethouseDashboard = () => {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* Sidebar - Enhanced with gradient and better spacing */}
+      {/* Sidebar */}
       <div className="w-64 bg-gradient-to-b from-[#F27781] to-[#D9536F] text-white flex flex-col p-4 space-y-6 shadow-lg">
         <div className="flex items-center space-x-3 px-2 py-3">
           <div className="p-2 bg-white/30 rounded-lg">
@@ -154,7 +225,7 @@ const PethouseDashboard = () => {
 
         <nav className="flex-1 space-y-2">
           {sidebarNavItems.map(([label, Icon, path]) => (
-            <Link // Changed to Link for navigation
+            <Link
               key={label}
               to={path}
               className="flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-white/20 transition-colors group"
@@ -189,7 +260,7 @@ const PethouseDashboard = () => {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Topbar - More refined with better shadows */}
+        {/* Topbar */}
         <header className="bg-white px-6 py-4 flex justify-between items-center border-b border-gray-200 shadow-sm">
           <div className="relative flex-1 max-w-md">
             <input
@@ -245,7 +316,7 @@ const PethouseDashboard = () => {
             </p>
           </div>
 
-          {/* Stats - Cards with better design */}
+          {/* Stats */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {statsData.map(({ label, value, meta, icon: Icon, color }) => (
               <div
@@ -288,7 +359,8 @@ const PethouseDashboard = () => {
                 {bookings.map((booking) => (
                   <div
                     key={booking._id}
-                    className="bg-white p-5 rounded-xl shadow-lg hover:shadow-xl transition-shadow border border-gray-200 flex flex-col justify-between"
+                    className="bg-white p-5 rounded-xl shadow-lg hover:shadow-xl transition-shadow border border-gray-200 flex flex-col justify-between cursor-pointer" // Added cursor-pointer
+                    onClick={() => handleBookingClick(booking)} // Add click handler here
                   >
                     <div>
                       <div className="flex justify-between items-start mb-2">
@@ -296,75 +368,136 @@ const PethouseDashboard = () => {
                           {booking.userId?.name || "N/A"}
                         </h2>
                         <span
-                          className={`px-2 py-0.5 text-xs font-semibold rounded-full
+                          className={`px-2 py-0.5 text-xs font-semibold rounded-full capitalize
                           ${
                             booking.status === "confirmed"
                               ? "bg-green-100 text-green-700"
                               : booking.status === "pending"
                               ? "bg-yellow-100 text-yellow-700"
-                              : booking.status === "cancelled"
+                              : booking.status === "cancelled" ||
+                                booking.status === "rejected" // Check for both
                               ? "bg-red-100 text-red-700"
+                              : booking.status === "completed" // Style for completed
+                              ? "bg-blue-100 text-blue-700"
                               : "bg-gray-100 text-gray-700"
                           }`}
                         >
-                          {booking.status}
+                          {booking.status || "N/A"} {/* Display status */}
                         </span>
                       </div>
                       <p className="text-sm text-gray-600 mb-1">
                         <span className="font-medium">Email:</span>{" "}
                         {booking.userId?.email || "N/A"}
                       </p>
+                      {/* Assuming serviceType is an array or object with a name property */}
                       <p className="text-sm text-gray-600 mb-1">
                         <span className="font-medium">Service:</span>{" "}
                         {booking.serviceType?.[0]?.name ||
-                          booking.service?.petType ||
-                          "N/A"}
+                          booking.service?.name ||
+                          "N/A"}{" "}
+                        {/* Added fallback to booking.service?.name */}
                       </p>
                       <p className="text-sm text-gray-600 mb-1">
                         <span className="font-medium">Pet:</span>{" "}
-                        {booking.service?.petType || "N/A"}
+                        {/* Assuming petType is directly on booking or service */}
+                        {booking.petId?.name ||
+                          booking.service?.petType ||
+                          "N/A"}
+                        (
+                        {booking.petId?.breed ||
+                          booking.service?.petType ||
+                          "N/A"}
+                        )
                       </p>
                       <p className="text-sm text-gray-600 mb-1">
                         <span className="font-medium">Amount:</span> ₹
-                        {booking.payment?.amount || "N/A"} (
-                        {booking.payment?.status || "N/A"})
+                        {booking.payment?.amount
+                          ? booking.payment.amount.toFixed(2)
+                          : "N/A"}{" "}
+                        ({booking.payment?.status || "N/A"})
                       </p>
-                      <p className="text-sm text-gray-600 mb-1">
-                        <span className="font-medium">Dates:</span>{" "}
-                        {new Date(booking.startDate).toLocaleDateString()} -{" "}
-                        {new Date(booking.endDate).toLocaleDateString()}
-                      </p>
+                      {/* Check if startDate and endDate exist before formatting */}
+                      {booking.startDate && booking.endDate && (
+                        <p className="text-sm text-gray-600 mb-1">
+                          <span className="font-medium">Dates:</span>{" "}
+                          {new Date(booking.startDate).toLocaleDateString(
+                            "en-US",
+                            { year: "numeric", month: "short", day: "numeric" }
+                          )}{" "}
+                          -{" "}
+                          {new Date(booking.endDate).toLocaleDateString(
+                            "en-US",
+                            { year: "numeric", month: "short", day: "numeric" }
+                          )}
+                        </p>
+                      )}
+                      {/* Display appointmentTime if applicable to the booking */}
+                      {booking.appointmentTime && (
+                        <p className="text-sm text-gray-600 mb-1">
+                          <span className="font-medium">Time:</span>{" "}
+                          {booking.appointmentTime}
+                        </p>
+                      )}
                       <p className="text-sm text-gray-600 mb-3">
                         <span className="font-medium">Payment Method:</span>{" "}
                         {booking.payment?.method || "N/A"}
                       </p>
                     </div>
 
+                    {/* Quick Actions (optional, modal gives full actions) */}
+                    {/* You could keep quick Accept/Reject here OR rely solely on the modal */}
+                    {/* Keeping for now, but modal provides a more comprehensive view */}
                     <div className="mt-auto flex gap-3 pt-3 border-t border-gray-100">
                       {booking.status === "pending" && (
                         <>
                           <button
-                            onClick={() => handleAccept(booking._id)}
-                            className="flex-1 px-4 py-2 bg-green-500 text-white text-sm font-medium rounded-lg hover:bg-green-600 transition-colors focus:outline-none focus:ring-2 focus:ring-green-400"
+                          // We'll now handle actions via the modal.
+                          // You could keep these quick buttons, but make sure
+                          // clicking them also closes the modal if it's open,
+                          // or ideally, direct the user to the modal for actions.
+                          // For simplicity, let's remove quick actions here and
+                          // rely on the modal buttons.
+                          // onClick={() => handleAcceptBooking(booking)} // Use modal function name
+                          // className="flex-1 px-4 py-2 bg-green-500 text-white text-sm font-medium rounded-lg hover:bg-green-600 transition-colors focus:outline-none focus:ring-2 focus:ring-green-400"
                           >
-                            Accept
+                            {/* Accept */}
                           </button>
                           <button
-                            onClick={() => handleReject(booking._id)}
-                            className="flex-1 px-4 py-2 bg-red-500 text-white text-sm font-medium rounded-lg hover:bg-red-600 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400"
+                          // onClick={() => handleRejectBooking(booking)} // Use modal function name
+                          // className="flex-1 px-4 py-2 bg-red-500 text-white text-sm font-medium rounded-lg hover:bg-red-600 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400"
                           >
-                            Reject
+                            {/* Reject */}
+                          </button>
+                          {/* Add a button to open modal explicitly if card click isn't intuitive */}
+                          <button
+                            onClick={(e) => {
+                              // Stop propagation so card click doesn't also trigger this
+                              e.stopPropagation();
+                              handleBookingClick(booking);
+                            }}
+                            className="flex-1 px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-lg hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
+                          >
+                            View Details
                           </button>
                         </>
                       )}
-                      {booking.status === "confirmed" && (
-                        <span className="text-sm font-semibold text-green-600 w-full text-center">
-                          Booking Confirmed
-                        </span>
-                      )}
-                      {booking.status === "cancelled" && (
-                        <span className="text-sm font-semibold text-red-600 w-full text-center">
-                          Booking Cancelled
+                      {/* Display status message if no quick actions */}
+                      {booking.status !== "pending" && (
+                        <span
+                          className={`text-sm font-semibold w-full text-center capitalize
+                             ${
+                               booking.status === "confirmed"
+                                 ? "text-green-600"
+                                 : booking.status === "cancelled" ||
+                                   booking.status === "rejected"
+                                 ? "text-red-600"
+                                 : booking.status === "completed"
+                                 ? "text-blue-600"
+                                 : "text-gray-600"
+                             }
+                           `}
+                        >
+                          {booking.status}
                         </span>
                       )}
                     </div>
@@ -375,6 +508,15 @@ const PethouseDashboard = () => {
           </div>
         </main>
       </div>
+
+      {/* Booking Detail Modal */}
+      {isModalOpen && selectedBooking && (
+        <BookingModal
+          booking={selectedBooking} // Pass the selected booking data
+          onClose={handleCloseModal} // Pass the close handler
+          // Add other handlers if you included them in BookingModal (e.g., onVideoCall, onChat)
+        />
+      )}
     </div>
   );
 };

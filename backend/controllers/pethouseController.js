@@ -214,6 +214,79 @@ const ratePetHouse = async (req, res) => {
   }
 };
 
+const updatePetHouseProfile = async (req, res) => {
+  try {
+    const petHouseId = req.user.id;
+    
+    // Validate required fields
+    if (!req.body || Object.keys(req.body).length === 0) {
+      return res.status(400).json({ message: "No updates provided" });
+    }
+
+    // Find clinic first to ensure it exists
+    const house = await PetHouse.findById(petHouseId).select('-password');
+    if (!house) {
+      return res.status(404).json({ message: "Pet Clinic not found" });
+    }
+
+    // Prepare updates object
+    const updates = {};
+    const allowedFields = [
+      'name', 'email', 'phone','address'
+    ];
+
+    // Validate and process updates
+    for (const field of allowedFields) {
+      if (req.body[field] !== undefined) {
+        if (field === 'address') {
+          updates.address = {
+            ...clinic.address,
+            ...req.body.address
+          };
+        }  else {
+          updates[field] = req.body[field];
+        }
+      }
+    }
+
+    // Handle geocoding if address changed
+    
+
+    // Perform the update
+    const updatedHouse = await PetHouse.findByIdAndUpdate(
+      petHouseId,
+      { $set: updates },
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    if (!updatedHouse) {
+      return res.status(500).json({ message: "Update failed" });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: updatedHouse
+    });
+
+  } catch (error) {
+    console.error("Error updating clinic profile:", error);
+    
+    // Handle validation errors specifically
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ 
+        success: false,
+        message: "Validation failed",
+        errors: error.errors 
+      });
+    }
+
+    res.status(500).json({ 
+      success: false,
+      message: error.message || "Internal server error" 
+    });
+  }
+};
+
 module.exports = {
   signup,
   login,
@@ -224,4 +297,5 @@ module.exports = {
   cancelBooking,
   ratePetHouse,
   getPethouseBookings,
+  updatePetHouseProfile,
 };

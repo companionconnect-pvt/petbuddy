@@ -23,6 +23,7 @@ import PethouseProfile from "./components/Pethouse/PethouseProfile";
 
 import PetClinicDashboard from "./components/PetClinic/PetClinicDashboard";
 import PetClinicLogin from "./components/PetClinic/PetClinicLogin";
+import PetClinicProfile from "./components/PetClinic/PetClinicProfile";
 
 import UserLiveMap from "./components/UserLiveMap";
 
@@ -49,6 +50,7 @@ function App() {
         {/* PetClinic Routes */}
         <Route path="/petclinic/dashboard" element={<PetClinicDashboard />} />
         <Route path="/petclinic/login" element={<PetClinicLogin />} />
+        <Route path ="/petclinic/profile" element = {<PetClinicProfile/>} /> 
 
         {/* Routes with Navbar inside Layout */}
         <Route element={<Layout />}>

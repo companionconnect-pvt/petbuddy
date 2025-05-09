@@ -7,6 +7,7 @@ const {
   getAllPetHouses,
   acceptBooking,
   cancelBooking,
+  updatePetHouseProfile,
 } = require("../controllers/pethouseController");
 const verifyToken = require("../middlewares/auth");
 
@@ -24,5 +25,6 @@ router.get("/all", verifyToken, getAllPetHouses);
 router.get("/profile", verifyToken, getPetHouseProfile);
 router.patch("/update", verifyToken, updateProfile);
 router.get("/", getAllPetHouses);
+router.put("/profile", verifyToken, updatePetHouseProfile);
 
 module.exports = router;
