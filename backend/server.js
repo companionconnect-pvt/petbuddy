@@ -4,6 +4,8 @@ const cors = require("cors");
 const http = require("http");
 const { Server } = require("socket.io");
 require("dotenv").config();
+const NodeCache = require('node-cache')
+const myCache = new NodeCache()
 
 // Route Imports
 const clinicRoutes = require("./routes/clinicAuth.js");
@@ -23,10 +25,74 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "*", // Set to specific frontend URL in production
+    origin: "*", 
     methods: ["GET", "POST"],
   },
 });
+
+
+
+const cacheAllRoutes = (req, res, next) => {
+   
+    const userId = req.user?._id;
+    const cacheKeyPrefix = userId ? `cache::${userId}::` : 'cache::public::';
+
+    
+    const key = cacheKeyPrefix + req.originalUrl + '::' + req.method;
+
+    console.log(`[Cache Middleware] Request received for: ${req.originalUrl} with method: ${req.method}. Cache Key: ${key}`);
+
+   
+    if (req.method === 'GET') {
+        const cachedData = myCache.get(key);
+
+        if (cachedData) {
+            console.log(`[Cache Middleware] Cache hit for key: ${key}`);
+            
+            try {
+                
+                const originalSend = res.send;
+                res.send = originalSend; // Restore
+                res.send(cachedData);
+            } catch (sendError) {
+                console.error(`[Cache Middleware] Error sending cached data for key ${key}:`, sendError);
+                
+                next();
+            }
+            return; 
+        } else {
+            console.log(`[Cache Middleware] Cache miss for key: ${key}. Proceeding to route handler.`);
+            
+            const originalSend = res.send;
+            res.send = function (body) {
+                console.log(`[Cache Middleware] Intercepting res.send for key: ${key}. Caching data.`);
+               
+                try {
+                    
+                    myCache.set(key, body);
+                    console.log(`[Cache Middleware] Data cached successfully for key: ${key}`);
+                } catch (cacheError) {
+                    console.error(`[Cache Middleware] Error caching data for key ${key}:`, cacheError);
+                   
+                } finally {
+                     
+                     res.send = originalSend;
+                     originalSend.call(this, body);
+                }
+            };
+            next(); 
+        }
+    } else {
+        
+        console.log(`[Cache Middleware] Bypassing cache for non-GET method: ${req.method}`);
+        
+        next(); 
+    }
+};
+
+
+app.use(cacheAllRoutes);
+
 
 // Middleware
 app.use(cors());
@@ -105,3 +171,4 @@ io.on("connection", (socket) => {
 
 // Socket.IO: Video Call Logic
 setupVideoCall(io);
+

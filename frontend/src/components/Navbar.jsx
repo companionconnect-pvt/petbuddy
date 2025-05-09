@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
+import API from "../api";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -15,10 +16,33 @@ const Navbar = () => {
   }, []);
 
   // Handle signout
-  const handleSignout = () => {
-    localStorage.removeItem("token");
-    setIsLoggedIn(false);
-  };
+  const handleSignout = async () => {
+    console.log('Signout request called');
+    const token = localStorage.getItem("token"); // Get token once
+    console.log("Token before signout:", token); // Log the token you are sending
+
+    try {
+        // Correct way to send headers with a POST request (assuming Axios or similar)
+        // The second argument is the request body (null if no body needed for logout)
+        // The third argument is the config object, where headers go
+        const res = await API.post("/auth/logout", null, {
+             headers: {
+                 Authorization: `Bearer ${token}`
+             }
+         });
+
+        console.log("Backend response:", res.data); // Log the response data
+
+    } catch (error) {
+        console.error("Signout failed:", error.response ? error.response.data : error.message);
+        // Handle errors, maybe show a message to the user
+    } finally {
+        // Always remove token and update state regardless of backend success/failure for a client-side "logout"
+        localStorage.removeItem("token");
+        setIsLoggedIn(false);
+        console.log("Token removed from localStorage");
+    }
+};
 
   return (
     <header className="bg-white shadow sticky top-0 z-50">

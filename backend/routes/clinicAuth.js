@@ -9,5 +9,6 @@ router.post("/login", clinicController.login);
 router.get("/", clinicController.fetchAllClinics);
 router.get("/profile", verifyToken, clinicController.getClinicProfile);
 router.put("/profile", verifyToken, clinicController.updateClinicProfile)
+router.post("/logout", verifyToken, clinicController.logout);
 
 module.exports = router;
