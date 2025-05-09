@@ -148,6 +148,7 @@ const getClinicConsultations = async (req, res) => {
           }
         }
       ]);
+
   
       const todayAppointments = await Consultation.countDocuments({
         petClinicId: req.user.id,
@@ -167,6 +168,24 @@ const getClinicConsultations = async (req, res) => {
       res.status(500).send('Server Error');
     }
   }; 
+  const getConsultation = async (req, res) => {
+  try {
+    const consultation = await Consultation.findById(req.params.id)
+      .populate('userId', 'name email phoneNumber')
+      .populate('petId', 'name species breed age medicalHistory')
+      .populate('petClinicId', 'name address');
+
+    if (!consultation) {
+      return res.status(404).json({ message: "Consultation not found" });
+    }
+
+    res.status(200).json(consultation);
+  } catch (err) {
+    console.error("Error fetching consultation:", err);
+    res.status(500).json({ message: "Server error while fetching consultation." });
+  }
+};
+
   const getConfirmedBookingsWithoutDriver = async (req, res) => {
     try {
       const bookings = await Consultation.find({
@@ -200,4 +219,4 @@ const deleteConsultation = async(req, res) => {
     res.status(500).json({ message: "Server error." });
   }
 }
-module.exports = { createConsultation, getClinicConsultations, updateConsultationStatus, getConsultationStats, getConfirmedBookingsWithoutDriver, deleteConsultation};
+module.exports = { getConsultation,createConsultation, getClinicConsultations, updateConsultationStatus, getConsultationStats, getConfirmedBookingsWithoutDriver, deleteConsultation};

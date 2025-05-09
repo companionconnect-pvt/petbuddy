@@ -180,11 +180,11 @@ const MapComponent = ({ activeTrip }) => {
           <div className="trip-details">
             <div className="detail-row">
               <span className="detail-label">From:</span>
-              <span className="detail-value">{activeTrip.source}</span>
+              <span className="detail-value">{activeTrip.from}</span>
             </div>
             <div className="detail-row">
               <span className="detail-label">To:</span>
-              <span className="detail-value">{activeTrip.destination}</span>
+              <span className="detail-value">{activeTrip.to}</span>
             </div>
           </div>
         )}
