@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import API from "../../api";
 
 const PethouseLogin = () => {
@@ -72,6 +72,12 @@ const PethouseLogin = () => {
           >
             Login
           </button>
+          <p className="text-sm text-center text-gray-600">
+            Don't have an account?{" "}
+            <Link to="/pethouse/signup" className="text-indigo-600 hover:underline font-medium">
+              Sign up
+            </Link>
+          </p>
         </div>
       </form>
     </div>

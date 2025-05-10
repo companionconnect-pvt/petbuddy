@@ -24,8 +24,10 @@ import PethouseProfile from "./components/Pethouse/PethouseProfile";
 import PetClinicDashboard from "./components/PetClinic/PetClinicDashboard";
 import PetClinicLogin from "./components/PetClinic/PetClinicLogin";
 import PetClinicProfile from "./components/PetClinic/PetClinicProfile";
+import DriverSignupform from "./components/DriverSignupForm";
 
 import UserLiveMap from "./components/UserLiveMap";
+import DriverSignupForm from "./components/DriverSignupForm";
 
 function App() {
   return (
@@ -36,6 +38,7 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/clinic-signup" element={<PetClinicSignup />} />
         <Route path="/driver-login" element={<DriverLogin />} />
+        <Route path="/driver-signup" element={<DriverSignupForm />} />
         <Route path="/driverDashboard" element={<DriverDashboard />} />
         <Route path="/driver-profile" element={<DriverProfile />} />
         <Route path="/chat/:ticketId" element={<Chat />} />

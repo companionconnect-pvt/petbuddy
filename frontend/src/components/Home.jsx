@@ -18,6 +18,7 @@ const Home = () => {
   const handleProfile = () => navigate("/profile");
   const handlePetClinicLogin = () => navigate("/petclinic/login");
   const handlePetHouseLogin = () => navigate("/pethouse/login");
+  const handleDriverLogin = () => navigate("/driver-login");
 
   // Animation variants
   const container = {
@@ -316,6 +317,28 @@ const Home = () => {
                   Login as Pet House
                 </motion.button>
               </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2 }}
+                className="bg-gradient-to-br from-[#F27781]/10 to-[#8B5CF6]/10 p-8 rounded-2xl border border-gray-200 hover:border-[#F27781] transition-all"
+              >
+                <div className="text-5xl mb-6">🚗</div>
+                <h3 className="text-2xl font-bold text-[#222222] mb-4">Driver</h3>
+                <p className="text-gray-600 mb-6">
+                  Join as a trained driver to help transport pets safely and reliably.
+                </p>
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={handleDriverLogin}
+                  className="w-full bg-gradient-to-r from-[#F27781] to-[#8B5CF6] text-white px-6 py-3 rounded-lg font-medium"
+                >
+                  Login as Driver
+                </motion.button>
+              </motion.div>
+
             </div>
           </div>
         </div>

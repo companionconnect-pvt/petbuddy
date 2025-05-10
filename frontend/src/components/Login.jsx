@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import API from "../api";
 
 const Login = () => {
@@ -26,7 +26,6 @@ const Login = () => {
         className="bg-white shadow-2xl rounded-3xl p-10 w-full max-w-md transition-all duration-300 hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)]"
       >
         <h2 className="text-3xl font-bold text-center text-indigo-700 mb-8">Login</h2>
-
 
         <div className="flex flex-col space-y-5">
           <div className="flex flex-col">
@@ -65,6 +64,13 @@ const Login = () => {
           >
             Login
           </button>
+
+          <p className="text-sm text-center text-gray-600">
+            Don't have an account?{" "}
+            <Link to="/signup" className="text-indigo-600 hover:underline font-medium">
+              Sign up
+            </Link>
+          </p>
         </div>
       </form>
     </div>
