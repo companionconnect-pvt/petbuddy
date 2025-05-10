@@ -115,9 +115,6 @@ const Chat = () => {
 
         socket.on("receiveMessage", async (msg) => {
           try {
-            // Skip if this is our own message (we already added it optimistically)
-            if (msg.senderId === user.senderId) return;
-
             const decrypted = await decryptMessage(key, msg.encryptedMessage);
             setMessages((prev) => [
               ...prev,
@@ -152,14 +149,6 @@ const Chat = () => {
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
-  useEffect(() => {
-    // Socket cleanup
-    return () => {
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-      }
-    };
-  }, []);
 
   const sendMessage = async () => {
     if (!newMessage.trim() || !encryptionKey) return;
@@ -171,21 +160,7 @@ const Chat = () => {
       senderName: user.senderName,
       senderId: user.senderId,
       encryptedMessage: encrypted,
-      // Add a unique ID for the message
-      tempId: Date.now().toString() + Math.random().toString(36).substr(2, 9),
     };
-
-    // Optimistically add the message to the UI immediately
-    setMessages((prev) => [
-      ...prev,
-      {
-        senderId: user.senderId,
-        senderName: user.senderName,
-        message: newMessage,
-        timestamp: new Date().toISOString(),
-        tempId: messageData.tempId, // Use the same tempId
-      },
-    ]);
 
     try {
       const res = await fetch("http://localhost:5000/api/chat/send", {
@@ -194,21 +169,15 @@ const Chat = () => {
         body: JSON.stringify(messageData),
       });
 
-      if (!res.ok) {
+      if (res.ok) {
+        socketRef.current.emit("sendMessage", messageData);
+        setNewMessage("");
+      } else {
         console.error("Send failed");
-        // Remove the optimistic message if send fails
-        setMessages((prev) =>
-          prev.filter((msg) => msg.tempId !== messageData.tempId)
-        );
       }
     } catch (err) {
       console.error("Error:", err);
-      setMessages((prev) =>
-        prev.filter((msg) => msg.tempId !== messageData.tempId)
-      );
     }
-
-    setNewMessage("");
   };
 
   const handleClose = () => {
@@ -217,7 +186,7 @@ const Chat = () => {
       navigate("/login");
       return;
     }
-
+    
     try {
       const decoded = jwtDecode(token);
       switch (decoded.role) {
@@ -291,9 +260,7 @@ const Chat = () => {
           messages.map((msg, idx) => (
             <div
               key={idx}
-              className={`flex ${
-                msg.senderId === user.senderId ? "justify-end" : "justify-start"
-              }`}
+              className={`flex ${msg.senderId === user.senderId ? "justify-end" : "justify-start"}`}
             >
               <div
                 className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl relative ${
