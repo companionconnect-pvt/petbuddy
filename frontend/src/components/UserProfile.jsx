@@ -1030,7 +1030,7 @@ const UserProfile = () => {
                       <button
                         onClick={() => {
                           // Implement tracking functionality
-                          navigate(`/tracking/${booking._id}`);
+                          navigate(`/map/${booking._id}`);
                         }}
                         className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center space-x-2"
                       >
