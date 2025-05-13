@@ -113,8 +113,12 @@ const Chat = () => {
         socket.emit("joinRoom", ticketId);
         socketRef.current = socket;
 
+        // In your initialization useEffect:
         socket.on("receiveMessage", async (msg) => {
           try {
+            // Skip if this is our own message (server shouldn't send it back)
+            if (msg.senderId === user.senderId) return;
+            
             const decrypted = await decryptMessage(key, msg.encryptedMessage);
             setMessages((prev) => [
               ...prev,
@@ -163,19 +167,41 @@ const Chat = () => {
     };
 
     try {
+      // Optimistically add to UI immediately
+      const tempId = Date.now(); // Temporary ID for local display
+      setMessages(prev => [
+        ...prev,
+        {
+          tempId, // Add temporary ID
+          senderId: user.senderId,
+          senderName: user.senderName,
+          message: newMessage,
+          timestamp: new Date().toISOString(),
+          isOptimistic: true // Mark as optimistic
+        }
+      ]);
+      setNewMessage("");
+      socketRef.current.emit("sendMessage", messageData);
+      // Send to server
       const res = await fetch("http://localhost:5000/api/chat/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(messageData),
       });
 
-      if (res.ok) {
-        socketRef.current.emit("sendMessage", messageData);
-        setNewMessage("");
-      } else {
+      if (!res.ok) {
+        // Remove the optimistic message if send fails
+        setMessages(prev => prev.filter(msg => msg.tempId !== tempId));
         console.error("Send failed");
+        return;
       }
+
+      // Don't emit to socket - let the server handle broadcasting
+      // The server should NOT echo back to the sender
     } catch (err) {
+      // Remove the optimistic message on error
+      const tempId = Date.now();
+      setMessages(prev => prev.filter(msg => msg.tempId !== tempId));
       console.error("Error:", err);
     }
   };
